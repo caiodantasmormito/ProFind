@@ -5,6 +5,7 @@ import 'package:profind/config/themes/dark_theme.dart';
 import 'package:profind/config/themes/light_theme.dart';
 import 'package:profind/core/infra/http_client.dart';
 import 'package:profind/features/login/core/authenticate_provider.dart';
+import 'package:profind/features/messages/core/messages_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,9 +29,10 @@ class AppWidget extends StatelessWidget {
             ),
           ),
           ...LoginInject.providers,
+          ...MessagesInject.providers,
         ],
         child: MaterialApp.router(
-          title: 'UEX App',
+          title: 'ProFind',
           debugShowCheckedModeBanner: false,
           routerConfig: router(preferences),
           theme: lightTheme,
