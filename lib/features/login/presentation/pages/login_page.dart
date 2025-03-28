@@ -5,6 +5,7 @@ import 'package:profind/core/firebase/firebase.dart';
 import 'package:profind/features/home/presentation/pages/home_page.dart';
 import 'package:profind/features/login/domain/usecase/authenticate_usecase.dart';
 import 'package:profind/features/login/presentation/bloc/authenticate_bloc.dart';
+import 'package:profind/features/registration/presentation/pages/registration_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -24,6 +25,7 @@ class _LoginPageState extends State<LoginPage> {
   bool isRegistering = false;
   bool isLoading = false;
   bool _isObscurePassword = true;
+  String? _userType;
   @override
   void initState() {
     _emailController = TextEditingController();
@@ -41,6 +43,51 @@ class _LoginPageState extends State<LoginPage> {
     _emailFocus.dispose();
     _passwordFocus.dispose();
     super.dispose();
+  }
+
+  void _showUserTypeDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Selecione o tipo de cadastro'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('Cliente'),
+              leading: const Icon(Icons.person),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() => _userType = 'client');
+                _navigateToRegistration();
+              },
+            ),
+            ListTile(
+              title: const Text('Prestador de Serviço'),
+              leading: const Icon(Icons.handyman),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() => _userType = 'service_provider');
+                _navigateToRegistration();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _navigateToRegistration() {
+    if (_userType == 'client') {
+      context.push(ClientRegistrationPage.routeName);
+    } else if (_userType == 'service_provider') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ClientRegistrationPage(),
+        ),
+      );
+    }
   }
 
   @override
@@ -142,16 +189,23 @@ class _LoginPageState extends State<LoginPage> {
                         return null;
                       },
                     ),
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          isRegistering = !isRegistering;
-                        });
-                      },
-                      child: Text(
-                        isRegistering ? "Entrar" : "Registre-se",
-                        style: TextStyle(color: Colors.white),
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Não possui uma conta?',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            _showUserTypeDialog();
+                          },
+                          child: Text(
+                            "Registre-se",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -219,7 +273,7 @@ class _LoginPageState extends State<LoginPage> {
                             );
                           }
                           if (state is AuthenticateSuccess) {
-                            context.push(HomePage.routeName);
+                            context.pushReplacement(HomePage.routeName);
                           }
                         },
                         builder: (context, state) {

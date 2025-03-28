@@ -65,7 +65,8 @@ final class RegistrationDataSourceImpl implements RegistrationDataSource {
   }
 
   @override
-  Future<ClientModel> registerClient({required ClientModel clientModel, required String password}) async {
+  Future<ClientModel> registerClient(
+      {required ClientModel clientModel, required String password}) async {
     try {
       final UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
@@ -84,7 +85,8 @@ final class RegistrationDataSourceImpl implements RegistrationDataSource {
         'city': clientModel.city,
         'uf': clientModel.uf,
         'cep': clientModel.cep,
-        
+        'phone': clientModel.phone,
+        'address': clientModel.address,
         'userType': 'client',
         'createdAt': FieldValue.serverTimestamp(),
       };
@@ -92,6 +94,8 @@ final class RegistrationDataSourceImpl implements RegistrationDataSource {
       await _firestore.collection('client').doc(userId).set(userData);
 
       return ClientModel(
+        address: clientModel.address,
+        phone: clientModel.phone,
         id: userId,
         name: clientModel.name,
         surname: clientModel.surname,
@@ -100,7 +104,6 @@ final class RegistrationDataSourceImpl implements RegistrationDataSource {
         city: clientModel.city,
         uf: clientModel.uf,
         cep: clientModel.cep,
-        
       );
     } on FirebaseAuthException catch (e) {
       throw RegisterException(message: e.message ?? "Falha no cadastro.");

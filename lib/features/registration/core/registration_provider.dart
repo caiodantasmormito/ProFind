@@ -25,5 +25,10 @@ sealed class RegistrationInject {
         repository: context.read<RegistrationRepository>(),
       ),
     ),
+    Provider<RegistrationServiceProviderUsecase>(
+      create: (context) => RegistrationServiceProviderUsecase(
+        repository: context.read<RegistrationRepository>(),
+      ),
+    ),
   ];
 }

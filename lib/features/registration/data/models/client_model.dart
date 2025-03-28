@@ -11,9 +11,13 @@ final class ClientModel extends ClientEntity {
     required super.city,
     required super.uf,
     required super.cep,
+    required super.address,
+    required super.phone
   });
   factory ClientModel.fromJson(Map<String, dynamic> map) {
     return ClientModel(
+      phone: map['phone'] ?? '',
+      address: map['address'] ?? '',
       id: map['id']?.toInt() ?? 0,
       name: map['name'] ?? '',
       surname: map['surname'] ?? '',
@@ -27,6 +31,8 @@ final class ClientModel extends ClientEntity {
 
   Map<String, dynamic> toMap() {
     return {
+      'phone': phone,
+      'address': address,
       'id': id,
       'name': name,
       'surname': surname,

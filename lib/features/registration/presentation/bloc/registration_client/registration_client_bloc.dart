@@ -6,10 +6,10 @@ import 'package:profind/features/registration/domain/usecases/registration_clien
 part 'registration_client_event.dart';
 part 'registration_client_state.dart';
 
-class RegistrationBloc
+class RegistrationClientBloc
     extends Bloc<RegistrationClientEvent, RegistrationClientState> {
   final RegistrationClientUsecase useCase;
-  RegistrationBloc({required this.useCase})
+  RegistrationClientBloc({required this.useCase})
       : super(RegistrationClientInitial()) {
     on<RegistrationClient>((event, emit) async {
       emit(RegistrationClientLoading());
