@@ -17,11 +17,13 @@ class RegistrationServiceProviderBloc extends Bloc<
       final (failure, client) = await useCase(event.params);
       if (failure == null) {
         emit(RegistrationServiceProviderSuccess(data: client!));
-
-        return;
+      } else {
+        final errorMessage = failure is RegistrationServiceProviderError &&
+                failure.message == 'CPF já cadastrado'
+            ? 'Já existe um contato com este CPF'
+            : failure.message;
+        emit(RegistrationServiceProviderError(message: errorMessage));
       }
-      emit(RegistrationServiceProviderError(
-          message: failure.message.toString()));
     });
   }
 }

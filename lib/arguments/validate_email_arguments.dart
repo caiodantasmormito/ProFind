@@ -7,6 +7,7 @@ class ValidateEmailArguments {
   final String uf;
   final String phone;
   final String address;
+  final String? service;
 
   ValidateEmailArguments({
     required this.name,
@@ -17,6 +18,7 @@ class ValidateEmailArguments {
     required this.phone,
     required this.uf,
     required this.address,
+    this.service,
   });
 
   Map<String, dynamic> toJson() {
@@ -29,6 +31,7 @@ class ValidateEmailArguments {
       'cep': cep,
       'uf': uf,
       'address': address,
+      'service': service,
     };
   }
 
@@ -38,10 +41,11 @@ class ValidateEmailArguments {
       surname: json['surname'] as String,
       cpf: json['cpf'] as String,
       cep: json['cep'] as String,
-      city: json['city'],
-      phone: json['phone'],
-      uf: json['uf'],
-      address: json['address'],
+      city: json['city'] as String,
+      phone: json['phone'] as String,
+      uf: json['uf'] as String,
+      address: json['address'] as String,
+      service: json['service'] as String,
     );
   }
 }
