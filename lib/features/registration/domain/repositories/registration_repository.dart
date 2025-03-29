@@ -9,4 +9,5 @@ abstract interface class RegistrationRepository {
 
   Future<(Failure?, ClientEntity?)> registerClient(
       {required ClientEntity clientEntity, required String password});
+      Future<bool> verifyCpfExists(String cpf);
 }

@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:profind/features/registration/data/models/service_provider_model.dart';
 
 base class ServiceProviderEntity extends Equatable {
-  final String id;
+  final String? id;
   final String name;
   final String surname;
   final String email;
@@ -15,7 +15,7 @@ base class ServiceProviderEntity extends Equatable {
   
 
   const ServiceProviderEntity(
-      {required this.id,
+      {this.id,
       required this.name,
       required this.surname,
       required this.email,

@@ -10,5 +10,4 @@ ThemeData lightTheme = ThemeData(
       ),
     ),
     scaffoldBackgroundColor: Colors.white,
-    fontFamily: 'Manrope'
-    );
+    fontFamily: 'Manrope');

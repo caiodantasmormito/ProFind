@@ -5,7 +5,7 @@ sealed class RegistrationClientEvent extends Equatable {
 }
 
 final class RegistrationClient extends RegistrationClientEvent {
-  final ClientRegistrationParams params;
+  final RegistrationParams params;
   const RegistrationClient({required this.params});
 
   @override

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
-    primaryColor: Color(0xFF026b9c),
+    primaryColor: Color(0xFFfa7f3b),
     appBarTheme: AppBarTheme(
       backgroundColor: Color(0xFF101d23),
       elevation: 4,
@@ -10,11 +10,11 @@ ThemeData darkTheme = ThemeData(
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,
-        backgroundColor: Color(0xFF026b9c),
+        backgroundColor: Color(0xFFfa7f3b),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
-      floatingLabelStyle: TextStyle(color: Color(0xFF026b9c)),
+      floatingLabelStyle: TextStyle(color: Color(0xFFfa7f3b)),
       border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(
@@ -22,7 +22,7 @@ ThemeData darkTheme = ThemeData(
           )),
       focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(width: 1, color: Color(0xFF026b9c))),
+          borderSide: BorderSide(width: 1, color: Color(0xFFfa7f3b))),
     ),
-    scaffoldBackgroundColor: Color(0xFF101d23),
+    scaffoldBackgroundColor: Color(0xFFfa7f3b),
     fontFamily: 'Manrope');

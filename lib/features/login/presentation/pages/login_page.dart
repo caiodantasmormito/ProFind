@@ -5,7 +5,7 @@ import 'package:profind/core/firebase/firebase.dart';
 import 'package:profind/features/home/presentation/pages/home_page.dart';
 import 'package:profind/features/login/domain/usecase/authenticate_usecase.dart';
 import 'package:profind/features/login/presentation/bloc/authenticate_bloc.dart';
-import 'package:profind/features/registration/presentation/pages/registration_page.dart';
+import 'package:profind/features/registration/presentation/pages/registration_personal_info_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -79,12 +79,21 @@ class _LoginPageState extends State<LoginPage> {
 
   void _navigateToRegistration() {
     if (_userType == 'client') {
-      context.push(ClientRegistrationPage.routeName);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ClientRegistrationPage(
+            userType: _userType.toString(),
+          ),
+        ),
+      );
     } else if (_userType == 'service_provider') {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ClientRegistrationPage(),
+          builder: (context) => ClientRegistrationPage(
+            userType: _userType.toString(),
+          ),
         ),
       );
     }
@@ -94,48 +103,33 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Theme.of(context).dialogBackgroundColor,
-              Theme.of(context).primaryColor
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
+        decoration: BoxDecoration(color: Colors.white),
         child: SingleChildScrollView(
           physics: const ClampingScrollPhysics(),
           child: Column(
-            spacing: MediaQuery.of(context).size.height * 0.08,
+            spacing: MediaQuery.of(context).size.height * 0.001,
             children: [
-              SafeArea(
-                child: Image.asset(
-                  'assets/images/uex.png',
-                ),
+              Image.asset(
+                'assets/images/logo_app.png',
               ),
               Form(
                 key: _formKey,
                 child: Column(
+                  spacing: 16,
                   children: [
                     TextFormField(
                       controller: _emailController,
                       focusNode: _emailFocus,
                       onEditingComplete: () => _passwordFocus.requestFocus(),
                       decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         label: Text("E-Mail"),
                         hintText: 'Digite seu e-mail',
-                        errorStyle: TextStyle(color: Colors.white),
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        focusedErrorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
+                        errorStyle: TextStyle(color: Colors.red),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
@@ -159,6 +153,9 @@ class _LoginPageState extends State<LoginPage> {
                       keyboardType: TextInputType.visiblePassword,
                       textInputAction: TextInputAction.done,
                       decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         suffixIcon: IconButton(
                           onPressed: () {
                             setState(() {
@@ -169,22 +166,14 @@ class _LoginPageState extends State<LoginPage> {
                               ? const Icon(Icons.visibility_outlined)
                               : const Icon(Icons.visibility_off_outlined),
                         ),
-                        label: Text("Password"),
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        focusedErrorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
+                        label: Text("Senha"),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return "Password obrigatório.";
+                          return "Senha obrigatória.";
                         }
                         if (value.trim().length < 8) {
-                          return "Password deve conter no mínimo 8 caractéres";
+                          return "Senha deve conter no mínimo 8 caractéres";
                         }
                         return null;
                       },
@@ -202,13 +191,16 @@ class _LoginPageState extends State<LoginPage> {
                           },
                           child: Text(
                             "Registre-se",
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(color: const Color(0xFFfa7f3b)),
                           ),
                         ),
                       ],
                     ),
                   ],
                 ),
+              ),
+              SizedBox(
+                height: 32,
               ),
               SizedBox(
                 width: double.infinity,
@@ -258,7 +250,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Container(
                     height: MediaQuery.of(context).size.height * 0.05,
                     decoration: BoxDecoration(
-                      color: Colors.black,
+                      color: const Color(0xFFfa7f3b),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
@@ -283,7 +275,7 @@ class _LoginPageState extends State<LoginPage> {
                             );
                           }
                           return Text(
-                            "Continuar",
+                            "Entrar",
                             style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w500,

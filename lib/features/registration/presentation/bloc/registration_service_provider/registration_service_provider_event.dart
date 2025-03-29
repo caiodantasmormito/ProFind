@@ -5,7 +5,7 @@ sealed class RegistrationServiceProviderEvent extends Equatable {
 }
 
 final class RegistrationServiceProvider extends RegistrationServiceProviderEvent {
-  final ServiceProviderRegistrationParams params;
+  final RegistrationParams params;
   const RegistrationServiceProvider({required this.params});
 
   @override

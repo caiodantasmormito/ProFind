@@ -1,37 +1,46 @@
 import 'package:profind/core/domain/failure/failure.dart';
 import 'package:profind/core/domain/usecase/usecase.dart';
 import 'package:profind/features/registration/domain/entities/client_entity.dart';
+import 'package:profind/features/registration/domain/failures/failures.dart';
 import 'package:profind/features/registration/domain/repositories/registration_repository.dart';
 
 class RegistrationClientUsecase
-    implements UseCase<ClientEntity, ClientRegistrationParams> {
+    implements UseCase<ClientEntity, RegistrationParams> {
   final RegistrationRepository _repository;
 
   RegistrationClientUsecase({required RegistrationRepository repository})
       : _repository = repository;
 
   @override
-  Future<(Failure?, ClientEntity?)> call(ClientRegistrationParams params) =>
-      _repository.registerClient(
-        clientEntity: ClientEntity(
-            address: params.address,
-            phone: params.phone,
-            name: params.name,
-            surname: params.surname,
-            email: params.email,
-            cpf: params.cpf,
-            city: params.city,
-            uf: params.uf,
-            cep: params.cep),
-        password: params.password,
-      );
+  Future<(Failure?, ClientEntity?)> call(
+      RegistrationParams params) async {
+    final cpfExists = await _repository.verifyCpfExists(params.cpf);
+    if (cpfExists) {
+      return (RegistrationFailure(message: 'CPF já cadastrado'), null);
+    }
+    return await _repository.registerClient(
+      clientEntity: ClientEntity(
+          address: params.address,
+          phone: params.phone,
+          name: params.name,
+          surname: params.surname,
+          email: params.email,
+          cpf: params.cpf,
+          city: params.city,
+          uf: params.uf,
+          cep: params.cep),
+      password: params.password,
+    );
+  }
 }
 
-class ClientRegistrationParams {
+class RegistrationParams {
   final String name;
   final String surname;
   final String email;
   final String cpf;
+  final String? id;
+  final String? service;
 
   final String city;
   final String uf;
@@ -40,7 +49,9 @@ class ClientRegistrationParams {
   final String phone;
   final String address;
 
-  const ClientRegistrationParams({
+  const RegistrationParams({
+    this.id,
+    this.service,
     required this.phone,
     required this.name,
     required this.surname,

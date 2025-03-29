@@ -36,4 +36,13 @@ final class RegistrationRepositoryImpl implements RegistrationRepository {
       return (RegistrationFailure(message: error.message), null);
     }
   }
+
+  @override
+  Future<bool> verifyCpfExists(String cpf) async {
+    try {
+      return await dataSource.verifyCpfExists(cpf);
+    } catch (e) {
+      throw RegisterException(message: 'Erro ao verificar CPF');
+    }
+  }
 }

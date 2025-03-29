@@ -112,4 +112,15 @@ final class RegistrationDataSourceImpl implements RegistrationDataSource {
           message: e.message ?? "Falha ao salvar dados adicionais.");
     }
   }
+
+  @override
+  Future<bool> verifyCpfExists(String cpf) async {
+    final query = await FirebaseFirestore.instance
+        .collection('contacts')
+        .where('cpf', isEqualTo: cpf)
+        .limit(1)
+        .get();
+
+    return query.docs.isNotEmpty;
+  }
 }

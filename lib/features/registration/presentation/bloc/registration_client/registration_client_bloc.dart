@@ -16,10 +16,13 @@ class RegistrationClientBloc
       final (failure, client) = await useCase(event.params);
       if (failure == null) {
         emit(RegistrationClientSuccess(data: client!));
-
-        return;
+      } else {
+        final errorMessage = failure is RegistrationClientError &&
+                failure.message == 'CPF já cadastrado'
+            ? 'Já existe um contato com este CPF'
+            : failure.message;
+        emit(RegistrationClientError(message: errorMessage));
       }
-      emit(RegistrationClientError(message: failure.message.toString()));
     });
   }
 }

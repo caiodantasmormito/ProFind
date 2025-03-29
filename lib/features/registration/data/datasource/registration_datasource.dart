@@ -6,9 +6,7 @@ abstract interface class RegistrationDataSource {
       {required ServiceProviderModel serviceProviderModel,
       required String password});
 
-      Future<ClientModel> registerClient(
-      {required ClientModel clientModel,
-      required String password});
+  Future<ClientModel> registerClient(
+      {required ClientModel clientModel, required String password});
+  Future<bool> verifyCpfExists(String cpf);
 }
-
-
