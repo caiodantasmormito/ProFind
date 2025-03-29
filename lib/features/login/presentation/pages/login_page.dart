@@ -49,6 +49,7 @@ class _LoginPageState extends State<LoginPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
         title: const Text('Selecione o tipo de cadastro'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -91,6 +92,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         height: MediaQuery.of(context).size.height,

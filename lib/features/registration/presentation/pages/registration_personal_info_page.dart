@@ -119,6 +119,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         centerTitle: true,
         title: Text(widget.userType == 'client'
             ? 'Cadastro de Cliente'
@@ -155,7 +156,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
       focusNode: _nameFocus,
       decoration: const InputDecoration(
         labelText: 'Nome',
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(12),
+          ),
+        ),
       ),
       validator: (value) =>
           value?.isEmpty ?? true ? 'Por favor, insira seu nome' : null,
@@ -168,7 +173,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
       focusNode: _surnameFocus,
       decoration: const InputDecoration(
         labelText: 'Sobrenome',
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(12),
+          ),
+        ),
       ),
       validator: (value) =>
           value?.isEmpty ?? true ? 'Por favor, insira seu sobrenome' : null,
@@ -183,7 +192,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
       focusNode: _cpfFocus,
       decoration: const InputDecoration(
         labelText: 'CPF',
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(12),
+          ),
+        ),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) return 'CPF é obrigatório';
@@ -200,7 +213,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
       focusNode: _phoneFocus,
       decoration: const InputDecoration(
         labelText: 'Telefone',
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(12),
+          ),
+        ),
       ),
       keyboardType: TextInputType.phone,
       validator: (value) =>
@@ -214,7 +231,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
       focusNode: _serviceFocus,
       decoration: const InputDecoration(
         labelText: 'Serviço Oferecido',
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(12),
+          ),
+        ),
       ),
       validator: (value) =>
           value?.isEmpty ?? true ? 'Por favor, informe o serviço' : null,
@@ -228,7 +249,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
       inputFormatters: [cepFormatter],
       decoration: const InputDecoration(
         labelText: 'CEP',
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(12),
+          ),
+        ),
       ),
       keyboardType: TextInputType.number,
       validator: (value) => value?.isEmpty ?? true ? 'CEP é obrigatório' : null,
@@ -241,7 +266,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
       focusNode: _addressFocus,
       decoration: const InputDecoration(
         labelText: 'Endereço',
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(12),
+          ),
+        ),
       ),
       validator: (value) =>
           value?.isEmpty ?? true ? 'Por favor, insira seu endereço' : null,
@@ -254,7 +283,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
       focusNode: _cityFocus,
       decoration: const InputDecoration(
         labelText: 'Cidade',
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(12),
+          ),
+        ),
       ),
       validator: (value) =>
           value?.isEmpty ?? true ? 'Por favor, insira sua cidade' : null,
@@ -267,7 +300,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
       focusNode: _ufFocus,
       decoration: const InputDecoration(
         labelText: 'Estado (UF)',
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(12),
+          ),
+        ),
       ),
       validator: (value) {
         if (value == null || value.isEmpty)

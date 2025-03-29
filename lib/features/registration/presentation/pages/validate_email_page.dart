@@ -108,7 +108,11 @@ class _ValidateEmailPageState extends State<ValidateEmailPage> {
                   },
                   decoration: const InputDecoration(
                     labelText: 'Digite seu e-mail para cadastro',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(12),
+                      ),
+                    ),
                   ),
                 ),
                 TextFormField(
@@ -127,7 +131,11 @@ class _ValidateEmailPageState extends State<ValidateEmailPage> {
                           : const Icon(Icons.visibility_off_outlined),
                     ),
                     labelText: 'Senha',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(12),
+                      ),
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
