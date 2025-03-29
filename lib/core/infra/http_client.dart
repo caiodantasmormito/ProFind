@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 final _baseOptions = BaseOptions(
@@ -37,7 +36,7 @@ class AuthenticateInterceptor extends Interceptor {
       log('URL: ${options.path}');
       log('HEADERS: ${options.headers.toString()}');
     }
-    final token = await sharedPreferences.getString('access_token');
+    final token = sharedPreferences.getString('access_token');
     if (token != null) {
       options.headers.addAll({'Authorization': 'Bearer $token'});
     }

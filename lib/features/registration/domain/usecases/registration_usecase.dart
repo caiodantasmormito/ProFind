@@ -1,34 +1,44 @@
 import 'package:profind/core/domain/failure/failure.dart';
 import 'package:profind/core/domain/usecase/usecase.dart';
-import 'package:profind/features/registration/domain/entities/client_entity.dart';
+import 'package:profind/features/registration/domain/entities/user_entity.dart';
 import 'package:profind/features/registration/domain/failures/failures.dart';
 import 'package:profind/features/registration/domain/repositories/registration_repository.dart';
 
-class RegistrationClientUsecase
-    implements UseCase<ClientEntity, RegistrationParams> {
+class RegistrationUsecase implements UseCase<UserEntity, RegistrationParams> {
   final RegistrationRepository _repository;
 
-  RegistrationClientUsecase({required RegistrationRepository repository})
+  RegistrationUsecase({required RegistrationRepository repository})
       : _repository = repository;
 
   @override
-  Future<(Failure?, ClientEntity?)> call(
-      RegistrationParams params) async {
+  Future<(Failure?, UserEntity?)> call(RegistrationParams params) async {
     final cpfExists = await _repository.verifyCpfExists(params.cpf);
     if (cpfExists) {
       return (RegistrationFailure(message: 'CPF já cadastrado'), null);
     }
-    return await _repository.registerClient(
-      clientEntity: ClientEntity(
-          address: params.address,
-          phone: params.phone,
-          name: params.name,
-          surname: params.surname,
-          email: params.email,
-          cpf: params.cpf,
-          city: params.city,
-          uf: params.uf,
-          cep: params.cep),
+
+    if (params.userType == 'service_provider' && params.service == null) {
+      return (
+        RegistrationFailure(message: 'Serviço é obrigatório para prestadores'),
+        null
+      );
+    }
+
+    return await _repository.registerUser(
+      userEntity: UserEntity(
+        id: params.id,
+        name: params.name,
+        surname: params.surname,
+        email: params.email,
+        cpf: params.cpf,
+        city: params.city,
+        uf: params.uf,
+        cep: params.cep,
+        phone: params.phone,
+        address: params.address,
+        service: params.service,
+        userType: params.userType,
+      ),
       password: params.password,
     );
   }
@@ -41,13 +51,13 @@ class RegistrationParams {
   final String cpf;
   final String? id;
   final String? service;
-
   final String city;
   final String uf;
   final String cep;
   final String password;
   final String phone;
   final String address;
+  final String userType;
 
   const RegistrationParams({
     this.id,
@@ -62,5 +72,6 @@ class RegistrationParams {
     required this.cep,
     required this.address,
     required this.password,
+    required this.userType,
   });
 }

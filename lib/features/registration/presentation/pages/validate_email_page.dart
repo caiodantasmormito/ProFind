@@ -4,14 +4,16 @@ import 'package:go_router/go_router.dart';
 import 'package:profind/arguments/validate_email_arguments.dart';
 import 'package:profind/features/home/presentation/pages/home_page.dart';
 import 'package:profind/features/login/presentation/pages/login_page.dart';
-import 'package:profind/features/registration/domain/usecases/registration_client_usecase.dart';
-import 'package:profind/features/registration/presentation/bloc/registration_client/registration_client_bloc.dart';
+import 'package:profind/features/registration/domain/usecases/registration_usecase.dart';
+import 'package:profind/features/registration/presentation/bloc/registration_client/registration_bloc.dart';
 
 // ignore: must_be_immutable
 class ValidateEmailPage extends StatefulWidget {
-  const ValidateEmailPage({required this.arguments, super.key});
+  const ValidateEmailPage(
+      {required this.arguments, required this.userType, super.key});
   static const routeName = '/validateEmail';
   final ValidateEmailArguments arguments;
+  final String userType;
 
   @override
   State<ValidateEmailPage> createState() => _ValidateEmailPageState();
@@ -49,7 +51,6 @@ class _ValidateEmailPageState extends State<ValidateEmailPage> {
 
   @override
   Widget build(BuildContext context) {
-    //final args = widget.arguments;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -60,11 +61,11 @@ class _ValidateEmailPageState extends State<ValidateEmailPage> {
         )),
         backgroundColor: Colors.white,
       ),
-      body: BlocListener<RegistrationClientBloc, RegistrationClientState>(
+      body: BlocListener<RegistrationBloc, RegistrationState>(
         listener: (context, state) {
-          if (state is RegistrationClientSuccess) {
+          if (state is RegistrationSuccess) {
             context.pushReplacement(HomePage.routeName);
-          } else if (state is RegistrationClientError) {
+          } else if (state is RegistrationError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message.toString()),
@@ -151,10 +152,11 @@ class _ValidateEmailPageState extends State<ValidateEmailPage> {
                           uf: widget.arguments.uf,
                           cep: widget.arguments.cep,
                           phone: widget.arguments.phone,
+                          userType: widget.arguments.userType,
                           address: widget.arguments.address);
 
-                      context.read<RegistrationClientBloc>().add(
-                            RegistrationClient(params: params),
+                      context.read<RegistrationBloc>().add(
+                            RegisterUserEvent(params),
                           );
                     }
                   },
@@ -169,10 +171,9 @@ class _ValidateEmailPageState extends State<ValidateEmailPage> {
                         )),
                         borderRadius: BorderRadius.circular(12)),
                     child: Center(
-                      child: BlocBuilder<RegistrationClientBloc,
-                          RegistrationClientState>(
+                      child: BlocBuilder<RegistrationBloc, RegistrationState>(
                         builder: (context, registerState) {
-                          if (registerState is RegistrationClientLoading) {
+                          if (registerState is RegistrationLoading) {
                             return CircularProgressIndicator();
                           }
                           return Text(

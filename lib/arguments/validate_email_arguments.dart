@@ -8,6 +8,7 @@ class ValidateEmailArguments {
   final String phone;
   final String address;
   final String? service;
+  final String userType;
 
   ValidateEmailArguments({
     required this.name,
@@ -18,6 +19,7 @@ class ValidateEmailArguments {
     required this.phone,
     required this.uf,
     required this.address,
+    required this.userType,
     this.service,
   });
 
@@ -32,6 +34,7 @@ class ValidateEmailArguments {
       'uf': uf,
       'address': address,
       'service': service,
+      'userType': userType,
     };
   }
 
@@ -46,6 +49,7 @@ class ValidateEmailArguments {
       uf: json['uf'] as String,
       address: json['address'] as String,
       service: json['service'] as String,
+      userType: json['userType'],
     );
   }
 }

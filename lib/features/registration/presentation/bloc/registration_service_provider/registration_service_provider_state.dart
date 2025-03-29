@@ -1,4 +1,4 @@
-part of 'registration_service_provider_bloc.dart';
+/*part of 'registration_service_provider_bloc.dart';
 
 
 sealed class RegistrationServiceProviderState extends Equatable {
@@ -30,3 +30,4 @@ final class RegistrationServiceProviderSuccess extends RegistrationServiceProvid
   @override
   List<Object?> get props => [data];
 }
+*/

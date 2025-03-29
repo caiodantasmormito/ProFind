@@ -78,25 +78,14 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _navigateToRegistration() {
-    if (_userType == 'client') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ClientRegistrationPage(
-            userType: _userType.toString(),
-          ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RegistrationPage(
+          userType: _userType.toString(),
         ),
-      );
-    } else if (_userType == 'service_provider') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ClientRegistrationPage(
-            userType: _userType.toString(),
-          ),
-        ),
-      );
-    }
+      ),
+    );
   }
 
   @override

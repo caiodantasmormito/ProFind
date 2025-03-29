@@ -2,8 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:profind/features/registration/data/datasource/registration_datasource.dart';
 import 'package:profind/features/registration/data/exceptions/exceptions.dart';
-import 'package:profind/features/registration/data/models/client_model.dart';
-import 'package:profind/features/registration/data/models/service_provider_model.dart';
+import 'package:profind/features/registration/data/models/user_model.dart';
 
 final class RegistrationDataSourceImpl implements RegistrationDataSource {
   final FirebaseAuth _auth;
@@ -16,14 +15,19 @@ final class RegistrationDataSourceImpl implements RegistrationDataSource {
         _firestore = firestore ?? FirebaseFirestore.instance;
 
   @override
-  Future<ServiceProviderModel> registerServiceProvider({
-    required ServiceProviderModel serviceProviderModel,
+  Future<UserModel> registerUser({
+    required UserModel userModel,
     required String password,
   }) async {
     try {
+      if (userModel.userType != 'client' &&
+          userModel.userType != 'service_provider') {
+        throw RegisterException(message: "Tipo de usuário inválido");
+      }
+
       final UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
-        email: serviceProviderModel.email,
+        email: userModel.email,
         password: password,
       );
 
@@ -31,79 +35,40 @@ final class RegistrationDataSourceImpl implements RegistrationDataSource {
 
       final Map<String, dynamic> userData = {
         'id': userId,
-        'name': serviceProviderModel.name,
-        'surname': serviceProviderModel.surname,
-        'cpf': serviceProviderModel.cpf,
-        'email': serviceProviderModel.email,
-        'city': serviceProviderModel.city,
-        'uf': serviceProviderModel.uf,
-        'cep': serviceProviderModel.cep,
-        'service': serviceProviderModel.service,
-        'userType': 'service_provider',
+        'name': userModel.name,
+        'surname': userModel.surname,
+        'cpf': userModel.cpf,
+        'email': userModel.email,
+        'city': userModel.city,
+        'uf': userModel.uf,
+        'cep': userModel.cep,
+        'userType': userModel.userType,
         'createdAt': FieldValue.serverTimestamp(),
       };
 
-      await _firestore.collection('service_provider').doc(userId).set(userData);
+      if (userModel.userType == 'service_provider') {
+        if (userModel.service == null) {
+          throw RegisterException(
+              message: "Serviço é obrigatório para prestadores");
+        }
+        userData['service'] = userModel.service;
+      }
 
-      return ServiceProviderModel(
+      await _firestore.collection('users').doc(userId).set(userData);
+
+      return UserModel(
         id: userId,
-        name: serviceProviderModel.name,
-        surname: serviceProviderModel.surname,
-        cpf: serviceProviderModel.cpf,
-        email: serviceProviderModel.email,
-        city: serviceProviderModel.city,
-        uf: serviceProviderModel.uf,
-        cep: serviceProviderModel.cep,
-        service: serviceProviderModel.service,
-      );
-    } on FirebaseAuthException catch (e) {
-      throw RegisterException(message: e.message ?? "Falha no cadastro.");
-    } on FirebaseException catch (e) {
-      throw RegisterException(
-          message: e.message ?? "Falha ao salvar dados adicionais.");
-    }
-  }
-
-  @override
-  Future<ClientModel> registerClient(
-      {required ClientModel clientModel, required String password}) async {
-    try {
-      final UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: clientModel.email,
-        password: password,
-      );
-
-      final String userId = userCredential.user!.uid;
-
-      final Map<String, dynamic> userData = {
-        'id': userId,
-        'name': clientModel.name,
-        'surname': clientModel.surname,
-        'cpf': clientModel.cpf,
-        'email': clientModel.email,
-        'city': clientModel.city,
-        'uf': clientModel.uf,
-        'cep': clientModel.cep,
-        'phone': clientModel.phone,
-        'address': clientModel.address,
-        'userType': 'client',
-        'createdAt': FieldValue.serverTimestamp(),
-      };
-
-      await _firestore.collection('client').doc(userId).set(userData);
-
-      return ClientModel(
-        address: clientModel.address,
-        phone: clientModel.phone,
-        id: userId,
-        name: clientModel.name,
-        surname: clientModel.surname,
-        cpf: clientModel.cpf,
-        email: clientModel.email,
-        city: clientModel.city,
-        uf: clientModel.uf,
-        cep: clientModel.cep,
+        name: userModel.name,
+        surname: userModel.surname,
+        cpf: userModel.cpf,
+        email: userModel.email,
+        city: userModel.city,
+        uf: userModel.uf,
+        cep: userModel.cep,
+        phone: userModel.phone,
+        address: userModel.address,
+        service: userModel.service,
+        userType: userModel.userType,
       );
     } on FirebaseAuthException catch (e) {
       throw RegisterException(message: e.message ?? "Falha no cadastro.");
@@ -115,12 +80,15 @@ final class RegistrationDataSourceImpl implements RegistrationDataSource {
 
   @override
   Future<bool> verifyCpfExists(String cpf) async {
-    final query = await FirebaseFirestore.instance
-        .collection('contacts')
-        .where('cpf', isEqualTo: cpf)
-        .limit(1)
-        .get();
-
-    return query.docs.isNotEmpty;
+    try {
+      final query = await _firestore
+          .collection('users')
+          .where('cpf', isEqualTo: cpf)
+          .limit(1)
+          .get();
+      return query.docs.isNotEmpty;
+    } on FirebaseException catch (e) {
+      throw RegisterException(message: e.message ?? "Falha ao verificar CPF.");
+    }
   }
 }

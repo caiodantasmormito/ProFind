@@ -1,9 +1,9 @@
-import 'package:profind/core/domain/failure/failure.dart';
+/*import 'package:profind/core/domain/failure/failure.dart';
 import 'package:profind/core/domain/usecase/usecase.dart';
 import 'package:profind/features/registration/domain/entities/service_provider_entity.dart';
 import 'package:profind/features/registration/domain/failures/failures.dart';
 import 'package:profind/features/registration/domain/repositories/registration_repository.dart';
-import 'package:profind/features/registration/domain/usecases/registration_client_usecase.dart';
+import 'package:profind/features/registration/domain/usecases/registration_usecase.dart';
 
 class RegistrationServiceProviderUsecase
     implements
@@ -36,3 +36,4 @@ class RegistrationServiceProviderUsecase
     );
   }
 }
+*/
