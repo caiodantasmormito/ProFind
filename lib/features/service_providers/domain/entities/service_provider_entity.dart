@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:profind/features/registration/data/models/service_provider_model.dart';
+import 'package:profind/features/service_providers/data/models/service_provider_model.dart';
 
 base class ServiceProviderEntity extends Equatable {
   final String? id;
@@ -12,10 +12,11 @@ base class ServiceProviderEntity extends Equatable {
   final String uf;
   final String cep;
   final String service;
-  
+  final String phone;
 
   const ServiceProviderEntity(
       {this.id,
+      required this.phone,
       required this.name,
       required this.surname,
       required this.email,
@@ -27,10 +28,11 @@ base class ServiceProviderEntity extends Equatable {
 
   @override
   List<Object?> get props =>
-      [id, name, email, cpf, surname, city, uf, cep, service];
+      [id, name, email, cpf, surname, city, uf, cep, service, phone];
 
   ServiceProviderEntity copyWith({
     String? id,
+    String? phone,
     String? name,
     String? surname,
     String? email,
@@ -42,6 +44,7 @@ base class ServiceProviderEntity extends Equatable {
   }) {
     return ServiceProviderEntity(
       id: id ?? this.id,
+      phone: phone ?? this.phone,
       name: name ?? this.name,
       surname: surname ?? this.surname,
       email: email ?? this.email,
@@ -63,5 +66,6 @@ base class ServiceProviderEntity extends Equatable {
         uf: uf,
         cep: cep,
         service: service,
+        phone: phone,
       );
 }

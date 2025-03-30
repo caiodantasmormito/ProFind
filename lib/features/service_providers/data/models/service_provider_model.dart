@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:profind/features/registration/domain/entities/service_provider_entity.dart';
+import 'package:profind/features/service_providers/domain/entities/service_provider_entity.dart';
 
 final class ServiceProviderModel extends ServiceProviderEntity {
   const ServiceProviderModel({
     required super.id,
+    required super.phone,
     required super.name,
     required super.surname,
     required super.cpf,
@@ -15,7 +16,8 @@ final class ServiceProviderModel extends ServiceProviderEntity {
   });
   factory ServiceProviderModel.fromJson(Map<String, dynamic> map) {
     return ServiceProviderModel(
-      id: map['id']?.toInt() ?? 0,
+      phone: map['phone'] ?? '',
+      id: map['id'] ?? '',
       name: map['name'] ?? '',
       surname: map['surname'] ?? '',
       cpf: map['cpf'] ?? '',

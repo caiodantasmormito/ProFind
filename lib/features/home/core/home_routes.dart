@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:profind/features/home/presentation/pages/home_page.dart';
 
-sealed class HomeRoutes {
+/*sealed class HomeRoutes {
   static final List<RouteBase> routes = [
     GoRoute(
         path: HomePage.routeName,
@@ -9,4 +9,4 @@ sealed class HomeRoutes {
           return HomePage();
         }),
   ];
-}
+}*/

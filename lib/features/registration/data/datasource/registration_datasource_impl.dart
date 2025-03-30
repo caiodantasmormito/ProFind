@@ -40,6 +40,7 @@ final class RegistrationDataSourceImpl implements RegistrationDataSource {
         'id': userId,
         'name': userModel.name,
         'surname': userModel.surname,
+        'phone': userModel.phone,
         'cpf': userModel.cpf,
         'email': userModel.email,
         'city': userModel.city,
