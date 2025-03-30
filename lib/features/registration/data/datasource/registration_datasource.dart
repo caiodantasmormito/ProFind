@@ -7,5 +7,5 @@ abstract interface class RegistrationDataSource {
     
   });
   
-  Future<bool> verifyCpfExists(String cpf);
+  Future<bool> verifyCpf(String cpf);
 }

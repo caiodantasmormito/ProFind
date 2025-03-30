@@ -151,6 +151,10 @@ class _ValidateEmailPageState extends State<ValidateEmailPage> {
                   onTap: () {
                     if (_formKey.currentState!.validate()) {
                       final params = RegistrationParams(
+                          service:
+                              widget.arguments.userType == 'service_provider'
+                                  ? widget.arguments.service
+                                  : null,
                           email: _emailController.text,
                           password: _passwordController.text,
                           name: widget.arguments.name,

@@ -8,5 +8,5 @@ abstract interface class RegistrationRepository {
     
   });
 
-  Future<bool> verifyCpfExists(String cpf);
+  Future<bool> verifyCpf(String cpf);
 }

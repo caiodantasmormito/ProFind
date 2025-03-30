@@ -12,7 +12,7 @@ class RegistrationUsecase implements UseCase<UserEntity, RegistrationParams> {
 
   @override
   Future<(Failure?, UserEntity?)> call(RegistrationParams params) async {
-    final cpfExists = await _repository.verifyCpfExists(params.cpf);
+    final cpfExists = await _repository.verifyCpf(params.cpf);
     if (cpfExists) {
       return (RegistrationFailure(message: 'CPF já cadastrado'), null);
     }

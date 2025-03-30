@@ -54,7 +54,10 @@ final class RegistrationDataSourceImpl implements RegistrationDataSource {
         userData['service'] = userModel.service;
       }
 
-      await _firestore.collection('users').doc(userId).set(userData);
+      final String collectionName =
+          userModel.userType == 'client' ? 'clients' : 'service_providers';
+
+      await _firestore.collection(collectionName).doc(userId).set(userData);
 
       return UserModel(
         id: userId,
@@ -79,14 +82,23 @@ final class RegistrationDataSourceImpl implements RegistrationDataSource {
   }
 
   @override
-  Future<bool> verifyCpfExists(String cpf) async {
+  Future<bool> verifyCpf(String cpf) async {
     try {
-      final query = await _firestore
-          .collection('users')
+      final clientQuery = await _firestore
+          .collection('clients')
           .where('cpf', isEqualTo: cpf)
           .limit(1)
           .get();
-      return query.docs.isNotEmpty;
+
+      if (clientQuery.docs.isNotEmpty) return true;
+
+      final providerQuery = await _firestore
+          .collection('service_providers')
+          .where('cpf', isEqualTo: cpf)
+          .limit(1)
+          .get();
+
+      return providerQuery.docs.isNotEmpty;
     } on FirebaseException catch (e) {
       throw RegisterException(message: e.message ?? "Falha ao verificar CPF.");
     }
