@@ -4,6 +4,7 @@ import 'package:profind/features/registration/domain/entities/user_entity.dart';
 final class UserModel extends UserEntity {
   const UserModel({
     super.id,
+    required super.emailVerified,
     required super.userType,
     required super.name,
     required super.surname,
@@ -19,6 +20,7 @@ final class UserModel extends UserEntity {
   
     factory UserModel.fromJson(Map<String, dynamic> map) {
     return UserModel(
+      emailVerified: map['emailVerified'],
       userType: map['userType'],
       phone: map['phone'] ?? '',
       address: map['address'] ?? '',
@@ -36,6 +38,7 @@ final class UserModel extends UserEntity {
 
   Map<String, dynamic> toMap() {
     return {
+      'emailVerified': emailVerified,
       'phone': phone,
       'address': address,
       'id': id,

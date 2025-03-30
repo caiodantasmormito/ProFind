@@ -8,16 +8,27 @@ part 'authenticate_state.dart';
 
 class AuthenticateBloc extends Bloc<AuthenticateEvent, AuthenticateState> {
   final AuthenticateUseCase useCase;
-  AuthenticateBloc({required this.useCase}) : super(AuthenticateInitial()) {
-    on<LoginEvent>((event, emit) async {
-      emit(AuthenticateLoading());
-      final (failure, user) = await useCase(event.params);
-      if (failure == null) {
-        emit(AuthenticateSuccess(user: user!));
+  
 
+  AuthenticateBloc({required this.useCase}) : super(AuthenticateInitial()) {
+    on<LoginEvent>(_onLogin);
+  }
+
+  Future<void> _onLogin(
+      LoginEvent event, Emitter<AuthenticateState> emit) async {
+    emit(AuthenticateLoading());
+    try {
+      final (failure, user) = await useCase(event.params);
+
+      if (failure != null) {
+        emit(AuthenticateError(message: failure.message!));
         return;
       }
-      emit(AuthenticateError(message: failure.message.toString()));
-    });
+    
+
+      emit(AuthenticateSuccess(user: user!));
+    } catch (e) {
+      emit(AuthenticateError(message: e.toString()));
+    }
   }
 }

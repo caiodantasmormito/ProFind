@@ -27,6 +27,7 @@ class RegistrationUsecase implements UseCase<UserEntity, RegistrationParams> {
     return await _repository.registerUser(
       userEntity: UserEntity(
         id: params.id,
+        emailVerified: params.emailVerified,
         name: params.name,
         surname: params.surname,
         email: params.email,
@@ -46,6 +47,7 @@ class RegistrationUsecase implements UseCase<UserEntity, RegistrationParams> {
 
 class RegistrationParams {
   final String name;
+  final bool emailVerified;
   final String surname;
   final String email;
   final String cpf;
@@ -62,6 +64,7 @@ class RegistrationParams {
   const RegistrationParams({
     this.id,
     this.service,
+    required this.emailVerified,
     required this.phone,
     required this.name,
     required this.surname,

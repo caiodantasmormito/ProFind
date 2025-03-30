@@ -17,8 +17,9 @@ sealed class LoginInject {
       ),
     ),
     Provider<AuthenticateRepository>(
-      create: (context) =>
-          AuthenticateRepositoryImpl(auth: context.read<FirebaseAuth>()),
+      create: (context) => AuthenticateRepositoryImpl(
+        dataSource: context.read<AuthenticationDataSource>(),
+      ),
     ),
     Provider<AuthenticateUseCase>(
       create: (context) => AuthenticateUseCase(

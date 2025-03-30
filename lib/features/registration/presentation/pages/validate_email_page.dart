@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:profind/arguments/validate_email_arguments.dart';
-import 'package:profind/features/home/presentation/pages/home_page.dart';
 import 'package:profind/features/login/presentation/pages/login_page.dart';
 import 'package:profind/features/registration/domain/usecases/registration_usecase.dart';
-import 'package:profind/features/registration/presentation/bloc/registration_client/registration_bloc.dart';
+import 'package:profind/features/registration/presentation/bloc/registration/registration_bloc.dart';
+import 'package:profind/features/registration/presentation/pages/verification_email_page.dart';
 
 // ignore: must_be_immutable
 class ValidateEmailPage extends StatefulWidget {
@@ -22,18 +22,23 @@ class ValidateEmailPage extends StatefulWidget {
 class _ValidateEmailPageState extends State<ValidateEmailPage> {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
+  late final TextEditingController _confirmPasswordController;
   late final FocusNode _emailFocus;
   late final FocusNode _passwordFocus;
+  late final FocusNode _confirmPasswordFocus;
   late final GlobalKey<FormState> _formKey;
   bool _isObscurePassword = true;
+  bool _isObscureConfirmPassword = true;
 
   @override
   void initState() {
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
+    _confirmPasswordController = TextEditingController();
     _formKey = GlobalKey<FormState>();
     _emailFocus = FocusNode();
     _passwordFocus = FocusNode();
+    _confirmPasswordFocus = FocusNode();
 
     super.initState();
   }
@@ -42,9 +47,11 @@ class _ValidateEmailPageState extends State<ValidateEmailPage> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
 
     _emailFocus.dispose();
     _passwordFocus.dispose();
+    _confirmPasswordFocus.dispose();
 
     super.dispose();
   }
@@ -64,7 +71,13 @@ class _ValidateEmailPageState extends State<ValidateEmailPage> {
       body: BlocListener<RegistrationBloc, RegistrationState>(
         listener: (context, state) {
           if (state is RegistrationSuccess) {
-            context.pushReplacement(HomePage.routeName);
+            context.pushReplacement(
+              EmailVerificationPage.routeName,
+              extra: {
+                'userId': state.user.id,
+                'email': state.user.email,
+              },
+            );
           } else if (state is RegistrationError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -147,6 +160,42 @@ class _ValidateEmailPageState extends State<ValidateEmailPage> {
                     return null;
                   },
                 ),
+                TextFormField(
+                  controller: _confirmPasswordController,
+                  focusNode: _confirmPasswordFocus,
+                  obscureText: _isObscureConfirmPassword,
+                  decoration: InputDecoration(
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _isObscureConfirmPassword =
+                              !_isObscureConfirmPassword;
+                        });
+                      },
+                      icon: _isObscureConfirmPassword
+                          ? const Icon(Icons.visibility_outlined)
+                          : const Icon(Icons.visibility_off_outlined),
+                    ),
+                    labelText: 'Confrime sua senha',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(12),
+                      ),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return "Password obrigatório.";
+                    }
+                    if (value.trim().length < 8) {
+                      return "Password deve conter no mínimo 8 caractéres";
+                    }
+                    if (value != _passwordController.text) {
+                      return 'As senhas devem ser iguais.';
+                    }
+                    return null;
+                  },
+                ),
                 InkWell(
                   onTap: () {
                     if (_formKey.currentState!.validate()) {
@@ -165,7 +214,8 @@ class _ValidateEmailPageState extends State<ValidateEmailPage> {
                           cep: widget.arguments.cep,
                           phone: widget.arguments.phone,
                           userType: widget.arguments.userType,
-                          address: widget.arguments.address);
+                          address: widget.arguments.address,
+                          emailVerified: false);
 
                       context.read<RegistrationBloc>().add(
                             RegisterUserEvent(params),
@@ -186,7 +236,9 @@ class _ValidateEmailPageState extends State<ValidateEmailPage> {
                       child: BlocBuilder<RegistrationBloc, RegistrationState>(
                         builder: (context, registerState) {
                           if (registerState is RegistrationLoading) {
-                            return CircularProgressIndicator();
+                            return CircularProgressIndicator(
+                              color: Colors.white,
+                            );
                           }
                           return Text(
                             "Continuar",

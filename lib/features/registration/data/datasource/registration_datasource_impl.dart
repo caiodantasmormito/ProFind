@@ -31,7 +31,10 @@ final class RegistrationDataSourceImpl implements RegistrationDataSource {
         password: password,
       );
 
-      final String userId = userCredential.user!.uid;
+      final User user = userCredential.user!;
+      final String userId = user.uid;
+
+      await user.sendEmailVerification();
 
       final Map<String, dynamic> userData = {
         'id': userId,
@@ -43,6 +46,7 @@ final class RegistrationDataSourceImpl implements RegistrationDataSource {
         'uf': userModel.uf,
         'cep': userModel.cep,
         'userType': userModel.userType,
+        'emailVerified': userModel.emailVerified,
         'createdAt': FieldValue.serverTimestamp(),
       };
 
@@ -72,6 +76,7 @@ final class RegistrationDataSourceImpl implements RegistrationDataSource {
         address: userModel.address,
         service: userModel.service,
         userType: userModel.userType,
+        emailVerified: userModel.emailVerified,
       );
     } on FirebaseAuthException catch (e) {
       throw RegisterException(message: e.message ?? "Falha no cadastro.");
@@ -101,6 +106,49 @@ final class RegistrationDataSourceImpl implements RegistrationDataSource {
       return providerQuery.docs.isNotEmpty;
     } on FirebaseException catch (e) {
       throw RegisterException(message: e.message ?? "Falha ao verificar CPF.");
+    }
+  }
+
+  @override
+  Future<void> checkAndUpdateEmailVerification(String userId) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        throw RegisterException(message: "Usuário não autenticado");
+      }
+
+      if (user.uid != userId) {
+        throw RegisterException(message: "ID do usuário não corresponde");
+      }
+
+      await user.reload();
+
+      if (user.emailVerified) {
+        final clientDoc =
+            await _firestore.collection('clients').doc(userId).get();
+        final providerDoc =
+            await _firestore.collection('service_providers').doc(userId).get();
+
+        if (clientDoc.exists) {
+          await _firestore.collection('clients').doc(userId).update({
+            'emailVerified': true,
+            'emailVerifiedAt': FieldValue.serverTimestamp(),
+          });
+        } else if (providerDoc.exists) {
+          await _firestore.collection('service_providers').doc(userId).update({
+            'emailVerified': true,
+            'emailVerifiedAt': FieldValue.serverTimestamp(),
+          });
+        } else {
+          throw RegisterException(
+              message: "Usuário não encontrado nas coleções");
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      throw RegisterException(message: e.message ?? "Erro na autenticação");
+    } on FirebaseException catch (e) {
+      throw RegisterException(
+          message: e.message ?? "Falha ao verificar e-mail");
     }
   }
 }

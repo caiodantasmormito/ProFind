@@ -14,9 +14,11 @@ class UserEntity extends Equatable {
   final String address;
   final String? service;
   final String userType;
+  final bool emailVerified;
 
   const UserEntity({
     this.id,
+    required this.emailVerified,
     required this.name,
     required this.surname,
     required this.cpf,
@@ -33,6 +35,7 @@ class UserEntity extends Equatable {
   @override
   List<Object?> get props => [
         id,
+        emailVerified,
         address,
         phone,
         name,
@@ -48,6 +51,7 @@ class UserEntity extends Equatable {
 
   UserModel toModel() => UserModel(
         id: id,
+        emailVerified: emailVerified,
         name: name,
         surname: surname,
         cpf: cpf,

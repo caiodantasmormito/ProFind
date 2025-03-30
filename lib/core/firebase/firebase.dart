@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
-class AuthService {
+/*class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   User? get currentUser => _auth.currentUser;
@@ -58,4 +58,4 @@ class AuthService {
       throw Exception(e.message ?? "Erro ao excluir a conta.");
     }
   }
-}
+}*/

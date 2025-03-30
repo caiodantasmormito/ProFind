@@ -1,7 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:profind/core/firebase/firebase.dart';
 import 'package:profind/features/home/presentation/pages/home_page.dart';
 import 'package:profind/features/login/domain/usecase/authenticate_usecase.dart';
 import 'package:profind/features/login/presentation/bloc/authenticate_bloc.dart';
@@ -21,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   late final TextEditingController _passwordController;
   late final FocusNode _emailFocus;
   late final FocusNode _passwordFocus;
-  final firebaseService = AuthService();
+
   bool isRegistering = false;
   bool isLoading = false;
   bool _isObscurePassword = true;
@@ -118,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        label: Text("E-Mail"),
+                        label: Text("E-mail"),
                         hintText: 'Digite seu e-mail',
                         errorStyle: TextStyle(color: Colors.red),
                       ),
@@ -206,36 +206,6 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                           );
-
-                      try {
-                        if (isRegistering) {
-                          await firebaseService.registerWithEmailAndPassword(
-                            _emailController.text,
-                            _passwordController.text,
-                          );
-                          context.pushReplacement(HomePage.routeName);
-                        } else {
-                          final user =
-                              await firebaseService.signInWithEmailAndPassword(
-                            _emailController.text,
-                            _passwordController.text,
-                          );
-
-                          if (user != null) {
-                            context.pushReplacement(HomePage.routeName);
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text(
-                                      "Falha ao fazer login. Verifique suas credenciais.")),
-                            );
-                          }
-                        }
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("$e")),
-                        );
-                      }
                     }
                   },
                   child: Container(
@@ -247,6 +217,9 @@ class _LoginPageState extends State<LoginPage> {
                     child: Center(
                       child: BlocConsumer<AuthenticateBloc, AuthenticateState>(
                         listener: (context, state) {
+                          if (state is AuthenticateSuccess) {
+                            _checkEmailVerification(context);
+                          }
                           if (state is AuthenticateError) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
@@ -254,9 +227,6 @@ class _LoginPageState extends State<LoginPage> {
                                 backgroundColor: Colors.red,
                               ),
                             );
-                          }
-                          if (state is AuthenticateSuccess) {
-                            context.pushReplacement(HomePage.routeName);
                           }
                         },
                         builder: (context, state) {
@@ -283,5 +253,26 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _checkEmailVerification(BuildContext context) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await user.reload();
+
+      if (user.emailVerified) {
+        context.pushReplacement(HomePage.routeName);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:
+                Text('Por favor, verifique seu e-mail antes de fazer login.'),
+            duration: Duration(seconds: 5),
+          ),
+        );
+
+        await FirebaseAuth.instance.signOut();
+      }
+    }
   }
 }
