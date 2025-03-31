@@ -248,89 +248,91 @@ class _RegistrationPageState extends State<RegistrationPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Autocomplete<String>(
-          optionsBuilder: (TextEditingValue textEditingValue) {
-            if (textEditingValue.text.isEmpty) {
-              return const Iterable<String>.empty();
-            }
-            return suggestedServices.where((String option) {
-              return option
-                  .toLowerCase()
-                  .contains(textEditingValue.text.toLowerCase());
-            });
-          },
-          onSelected: (String selection) {
-            setState(() {
-              if (!_selectedServices.contains(selection)) {
-                _selectedServices.add(selection);
-                _serviceController.clear();
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _serviceFocus.requestFocus();
-                });
-              }
-            });
-          },
-          optionsViewBuilder: (context, onSelected, options) {
-            return Align(
-              alignment: Alignment.topLeft,
-              child: Material(
-                elevation: 4.0,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  color: Colors.white,
-                  child: ListView.builder(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    itemCount: options.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final option = options.elementAt(index);
-                      return InkWell(
-                        onTap: () => onSelected(option),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Text(
-                            option,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-            );
-          },
-          fieldViewBuilder: (
-            BuildContext context,
-            TextEditingController textEditingController,
-            FocusNode focusNode,
-            VoidCallback onFieldSubmitted,
-          ) {
-            return TextFormField(
-              controller: textEditingController,
-              focusNode: focusNode,
-              decoration: const InputDecoration(
-                labelText: 'Serviço Oferecido',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
-                ),
-                suffixIcon: Icon(Icons.arrow_drop_down),
-              ),
-              onFieldSubmitted: (value) {
-                if (value.isNotEmpty && !_selectedServices.contains(value)) {
-                  setState(() {
-                    _selectedServices.add(value);
-                    textEditingController.clear();
+        Row(
+          children: [
+            Expanded(
+              child: Autocomplete<String>(
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  if (textEditingValue.text.isEmpty) {
+                    return const Iterable<String>.empty();
+                  }
+                  return suggestedServices.where((String option) {
+                    return option
+                        .toLowerCase()
+                        .contains(textEditingValue.text.toLowerCase());
                   });
-                }
-              },
-              validator: (value) => _selectedServices.isEmpty
-                  ? 'Por favor, informe pelo menos um serviço'
-                  : null,
-            );
-          },
+                },
+                onSelected: (String selection) {
+                  _addService(selection);
+                },
+                optionsViewBuilder: (context, onSelected, options) {
+                  return Align(
+                    alignment: Alignment.topLeft,
+                    child: Material(
+                      elevation: 4.0,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        color: Colors.white,
+                        child: ListView.builder(
+                          padding: EdgeInsets.zero,
+                          shrinkWrap: true,
+                          itemCount: options.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final option = options.elementAt(index);
+                            return InkWell(
+                              onTap: () => onSelected(option),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Text(
+                                  option,
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                fieldViewBuilder: (
+                  BuildContext context,
+                  TextEditingController textEditingController,
+                  FocusNode focusNode,
+                  VoidCallback onFieldSubmitted,
+                ) {
+                  return TextFormField(
+                    controller: textEditingController,
+                    focusNode: focusNode,
+                    decoration: InputDecoration(
+                      labelText: 'Serviço Oferecido',
+                      border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(12),
+                        ),
+                      ),
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.arrow_drop_down),
+                        onPressed: () {
+                          _serviceFocus.requestFocus();
+                          _showServiceDropdown(context);
+                        },
+                      ),
+                    ),
+                    onFieldSubmitted: (value) {
+                      if (value.isNotEmpty &&
+                          !_selectedServices.contains(value)) {
+                        _addService(value);
+                      }
+                    },
+                    validator: (value) => _selectedServices.isEmpty
+                        ? 'Por favor, informe pelo menos um serviço'
+                        : null,
+                  );
+                },
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         if (_selectedServices.isNotEmpty) ...[
@@ -361,6 +363,43 @@ class _RegistrationPageState extends State<RegistrationPage> {
           ),
         ],
       ],
+    );
+  }
+
+  void _addService(String service) {
+    setState(() {
+      if (!_selectedServices.contains(service)) {
+        _selectedServices.add(service);
+        _serviceController.clear();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _serviceFocus.requestFocus();
+        });
+      }
+    });
+  }
+
+  void _showServiceDropdown(BuildContext context) {
+    final RenderBox textFieldRenderBox =
+        context.findRenderObject() as RenderBox;
+    final textFieldPosition = textFieldRenderBox.localToGlobal(Offset.zero);
+    final textFieldWidth = textFieldRenderBox.size.width;
+
+    showMenu(
+      color: Colors.white,
+      context: context,
+      position: RelativeRect.fromLTRB(
+        textFieldPosition.dx,
+        textFieldPosition.dy + textFieldRenderBox.size.height,
+        textFieldPosition.dx + textFieldWidth,
+        textFieldPosition.dy + textFieldRenderBox.size.height + 200,
+      ),
+      items: suggestedServices.map((service) {
+        return PopupMenuItem<String>(
+          value: service,
+          child: Text(service),
+          onTap: () => _addService(service),
+        );
+      }).toList(),
     );
   }
 
