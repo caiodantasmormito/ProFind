@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:profind/features/home/presentation/pages/home_page.dart';
 import 'package:profind/features/login/domain/usecase/authenticate_usecase.dart';
 import 'package:profind/features/login/presentation/bloc/authenticate_bloc.dart';
-import 'package:profind/features/registration/presentation/pages/registration_personal_info_page.dart';
+import 'package:profind/features/registration/presentation/pages/personal_info_registration_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

@@ -4,8 +4,8 @@ import 'package:profind/arguments/validate_email_arguments.dart';
 import 'package:profind/features/registration/domain/usecases/registration_usecase.dart';
 import 'package:profind/features/registration/presentation/bloc/registration/registration_bloc.dart';
 import 'package:profind/features/registration/presentation/bloc/verify_email/verify_email_bloc.dart';
-import 'package:profind/features/registration/presentation/pages/registration_personal_info_page.dart';
-import 'package:profind/features/registration/presentation/pages/registration_email_page.dart';
+import 'package:profind/features/registration/presentation/pages/personal_info_registration_page.dart';
+import 'package:profind/features/registration/presentation/pages/email_registraion_page.dart';
 import 'package:profind/features/registration/presentation/pages/verification_email_page.dart';
 
 sealed class RegistrationRoutes {

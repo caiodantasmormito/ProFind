@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:profind/arguments/validate_email_arguments.dart';
-import 'package:profind/features/registration/presentation/pages/registration_email_page.dart';
+import 'package:profind/features/registration/presentation/pages/email_registraion_page.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key, required this.userType});
