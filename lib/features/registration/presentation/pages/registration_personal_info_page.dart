@@ -16,6 +16,7 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
+  final List<String> _selectedServices = [];
   late final GlobalKey<FormState> _formKey;
   late final TextEditingController _nameController;
   late final TextEditingController _surnameController;
@@ -52,6 +53,28 @@ class _RegistrationPageState extends State<RegistrationPage> {
     filter: {'#': RegExp('[0-9]')},
   );
 
+  final List<String> suggestedServices = [
+    'Encanador',
+    'Eletricista',
+    'Pedreiro',
+    'Jardineiro',
+    'Motorista particular',
+    'Pintor',
+    'Marceneiro',
+    'Técnico em ar condicionado',
+    'Diarista',
+    'Cuidador de idosos',
+    'Babá',
+    'Personal trainer',
+    'Técnico em informática',
+    'Manicure',
+    'Cabeleireiro',
+    'Serralheiro',
+    'Azulejista'
+        'Freteiro',
+    'Barman'
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -86,12 +109,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   @override
   void dispose() {
-    _disposeControllers();
-    _disposeFocusNodes();
-    super.dispose();
-  }
-
-  void _disposeControllers() {
+    _selectedServices.clear();
     _nameController.dispose();
     _surnameController.dispose();
     _cpfController.dispose();
@@ -101,9 +119,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
     _ufController.dispose();
     _cepController.dispose();
     _serviceController.dispose();
-  }
-
-  void _disposeFocusNodes() {
     _nameFocus.dispose();
     _phoneFocus.dispose();
     _cpfFocus.dispose();
@@ -113,6 +128,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     _ufFocus.dispose();
     _surnameFocus.dispose();
     _serviceFocus.dispose();
+    super.dispose();
   }
 
   @override
@@ -229,19 +245,122 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
   Widget _buildServiceField() {
-    return TextFormField(
-      controller: _serviceController,
-      focusNode: _serviceFocus,
-      decoration: const InputDecoration(
-        labelText: 'Serviço Oferecido',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(12),
-          ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Autocomplete<String>(
+          optionsBuilder: (TextEditingValue textEditingValue) {
+            if (textEditingValue.text.isEmpty) {
+              return const Iterable<String>.empty();
+            }
+            return suggestedServices.where((String option) {
+              return option
+                  .toLowerCase()
+                  .contains(textEditingValue.text.toLowerCase());
+            });
+          },
+          onSelected: (String selection) {
+            setState(() {
+              if (!_selectedServices.contains(selection)) {
+                _selectedServices.add(selection);
+                _serviceController.clear();
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _serviceFocus.requestFocus();
+                });
+              }
+            });
+          },
+          optionsViewBuilder: (context, onSelected, options) {
+            return Align(
+              alignment: Alignment.topLeft,
+              child: Material(
+                elevation: 4.0,
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  color: Colors.white,
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    itemCount: options.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final option = options.elementAt(index);
+                      return InkWell(
+                        onTap: () => onSelected(option),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Text(
+                            option,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            );
+          },
+          fieldViewBuilder: (
+            BuildContext context,
+            TextEditingController textEditingController,
+            FocusNode focusNode,
+            VoidCallback onFieldSubmitted,
+          ) {
+            return TextFormField(
+              controller: textEditingController,
+              focusNode: focusNode,
+              decoration: const InputDecoration(
+                labelText: 'Serviço Oferecido',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                ),
+                suffixIcon: Icon(Icons.arrow_drop_down),
+              ),
+              onFieldSubmitted: (value) {
+                if (value.isNotEmpty && !_selectedServices.contains(value)) {
+                  setState(() {
+                    _selectedServices.add(value);
+                    textEditingController.clear();
+                  });
+                }
+              },
+              validator: (value) => _selectedServices.isEmpty
+                  ? 'Por favor, informe pelo menos um serviço'
+                  : null,
+            );
+          },
         ),
-      ),
-      validator: (value) =>
-          value?.isEmpty ?? true ? 'Por favor, informe o serviço' : null,
+        const SizedBox(height: 8),
+        if (_selectedServices.isNotEmpty) ...[
+          const Text(
+            'Serviços selecionados:',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 4),
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: _selectedServices.map((service) {
+              return Chip(
+                label: Text(
+                  service,
+                  style: const TextStyle(color: Colors.white),
+                ),
+                backgroundColor: const Color(0xFFfa7f3b),
+                deleteIcon:
+                    const Icon(Icons.close, size: 18, color: Colors.white),
+                onDeleted: () {
+                  setState(() {
+                    _selectedServices.remove(service);
+                  });
+                },
+              );
+            }).toList(),
+          ),
+        ],
+      ],
     );
   }
 
@@ -331,7 +450,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
             phone: _phoneController.text,
             uf: _ufController.text,
             address: _addressController.text,
-            service: _serviceController.text,
+            service: widget.userType == 'service_provider'
+                ? _selectedServices.join(', ')
+                : _serviceController.text,
             userType: widget.userType,
           );
 

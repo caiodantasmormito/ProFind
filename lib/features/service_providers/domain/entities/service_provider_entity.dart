@@ -11,7 +11,7 @@ base class ServiceProviderEntity extends Equatable {
   final String city;
   final String uf;
   final String cep;
-  final String service;
+  final List<String> service;
   final String phone;
 
   const ServiceProviderEntity(
@@ -40,7 +40,7 @@ base class ServiceProviderEntity extends Equatable {
     String? city,
     String? uf,
     String? cep,
-    String? service,
+    List<String>? service,
   }) {
     return ServiceProviderEntity(
       id: id ?? this.id,

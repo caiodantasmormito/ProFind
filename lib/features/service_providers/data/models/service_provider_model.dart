@@ -16,17 +16,18 @@ final class ServiceProviderModel extends ServiceProviderEntity {
   });
   factory ServiceProviderModel.fromJson(Map<String, dynamic> map) {
     return ServiceProviderModel(
-      phone: map['phone'] ?? '',
-      id: map['id'] ?? '',
-      name: map['name'] ?? '',
-      surname: map['surname'] ?? '',
-      cpf: map['cpf'] ?? '',
-      email: map['email'] ?? '',
-      city: map['city'] ?? '',
-      uf: map['uf'] ?? '',
-      cep: map['cep'] ?? '',
-      service: map['service'] ?? '',
-    );
+        phone: map['phone'] ?? '',
+        id: map['id'] ?? '',
+        name: map['name'] ?? '',
+        surname: map['surname'] ?? '',
+        cpf: map['cpf'] ?? '',
+        email: map['email'] ?? '',
+        city: map['city'] ?? '',
+        uf: map['uf'] ?? '',
+        cep: map['cep'] ?? '',
+        service: map['service'] is String
+            ? [map['service']]
+            : List<String>.from(map['service'] ?? []));
   }
 
   Map<String, dynamic> toMap() {

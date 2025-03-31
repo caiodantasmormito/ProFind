@@ -111,10 +111,11 @@ class _ClientHomePageState extends State<ClientHomePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Profissão: ${serviceProvider.service}',
+                              serviceProvider.service.join(','),
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black),
+                                  fontSize: 12,
+                                  color: Color(0xFFfa7f3b)),
                             ),
                             Text(
                                 '${serviceProvider.city}/${serviceProvider.uf}'),
