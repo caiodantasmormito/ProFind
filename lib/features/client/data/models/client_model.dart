@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:profind/features/registration/domain/entities/client_entity.dart';
+import 'package:profind/features/client/domain/entities/client_entity.dart';
 
 final class ClientModel extends ClientEntity {
   const ClientModel({

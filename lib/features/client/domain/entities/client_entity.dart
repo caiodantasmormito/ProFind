@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:profind/features/registration/data/models/client_model.dart';
+import 'package:profind/features/client/data/models/client_model.dart';
 
 base class ClientEntity extends Equatable {
   final String? id;
