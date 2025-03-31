@@ -6,12 +6,18 @@ class UserTypeChecker extends StatelessWidget {
   final Widget clientHome;
   final Widget serviceProviderHome;
   final Widget loadingWidget;
+  final Widget errorWidget;
+  final Widget unknownUserWidget;
 
   const UserTypeChecker({
     super.key,
     required this.clientHome,
     required this.serviceProviderHome,
     this.loadingWidget = const Center(child: CircularProgressIndicator()),
+    this.errorWidget =
+        const Center(child: Text('Erro ao verificar tipo de usuário')),
+    this.unknownUserWidget =
+        const Center(child: Text('Tipo de usuário desconhecido')),
   });
 
   @override
@@ -28,18 +34,31 @@ class UserTypeChecker extends StatelessWidget {
           return loadingWidget;
         }
 
-        final userData = snapshot.data!.data() as Map<String, dynamic>;
-        final userType = userData['userType'];
+        final userData = snapshot.data!.data();
+        final userType = _getUserTypeSafely(userData);
 
-        if (userType == 'client') {
-          return clientHome;
-        } else if (userType == 'service_provider') {
-          return serviceProviderHome;
+        switch (userType) {
+          case 'client':
+            return clientHome;
+          case 'service_provider':
+            return serviceProviderHome;
+          default:
+            return unknownUserWidget;
         }
-
-        return SizedBox.shrink();
       },
     );
+  }
+
+  String? _getUserTypeSafely(Object? userData) {
+    if (userData == null) return null;
+    if (userData is! Map<String, dynamic>) return null;
+
+    final dynamic userType = userData['userType'];
+
+    if (userType is String) return userType;
+    if (userType != null) return userType.toString();
+
+    return null;
   }
 
   Future<DocumentSnapshot> _getUserDocument(String userId) async {
@@ -52,11 +71,9 @@ class UserTypeChecker extends StatelessWidget {
       return clientDoc;
     }
 
-    final providerDoc = await FirebaseFirestore.instance
+    return await FirebaseFirestore.instance
         .collection('service_providers')
         .doc(userId)
         .get();
-
-    return providerDoc;
   }
 }

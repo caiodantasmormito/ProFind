@@ -5,7 +5,7 @@ import 'package:profind/features/registration/domain/usecases/registration_useca
 import 'package:profind/features/registration/presentation/bloc/registration/registration_bloc.dart';
 import 'package:profind/features/registration/presentation/bloc/verify_email/verify_email_bloc.dart';
 import 'package:profind/features/registration/presentation/pages/registration_personal_info_page.dart';
-import 'package:profind/features/registration/presentation/pages/validate_email_page.dart';
+import 'package:profind/features/registration/presentation/pages/registration_email_page.dart';
 import 'package:profind/features/registration/presentation/pages/verification_email_page.dart';
 
 sealed class RegistrationRoutes {

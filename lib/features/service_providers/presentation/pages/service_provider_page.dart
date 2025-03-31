@@ -5,19 +5,30 @@ import 'package:profind/features/login/presentation/pages/login_page.dart';
 
 class ServiceProviderHomePage extends StatelessWidget {
   const ServiceProviderHomePage({super.key});
+  static const String routeName = '/serviceProvider';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: const Text('Meu Perfil de Prestador'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              FirebaseAuth.instance.signOut();
-              context.pushReplacement(LoginPage.routeName);
+          PopupMenuButton<int>(
+            color: Colors.white,
+            icon: const Icon(Icons.menu, color: Colors.black),
+            onSelected: (value) {
+              if (value == 0) {
+                FirebaseAuth.instance.signOut();
+                context.pushReplacement(LoginPage.routeName);
+              }
             },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 0,
+                child: Text('Sair'),
+              ),
+            ],
           ),
         ],
       ),

@@ -35,6 +35,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
   @override
   void dispose() {
     _timer?.cancel();
+    _startVerificationTimer();
     super.dispose();
   }
 
@@ -49,7 +50,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
         if (user != null && user.emailVerified) {
           _timer?.cancel();
           if (mounted) {
-            context.pushReplacement(LoginPage.routeName);
+            context.go(LoginPage.routeName);
           }
         }
       } catch (e) {
@@ -116,9 +117,28 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                   color: Colors.white,
                 )
               else
-                ElevatedButton(
-                  onPressed: _resendVerificationEmail,
-                  child: const Text('Reenviar e-mail de verificação'),
+                SizedBox(
+                  width: double.infinity,
+                  child: InkWell(
+                    onTap: () async {
+                      _resendVerificationEmail;
+                    },
+                    child: Container(
+                      height: MediaQuery.of(context).size.height * 0.05,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFfa7f3b),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                          child: Text(
+                        'Reenviar e-mail de verificação',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white),
+                      )),
+                    ),
+                  ),
                 ),
               const SizedBox(height: 20),
               TextButton(
