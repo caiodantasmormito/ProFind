@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:profind/features/home/core/user_type_check.dart';
-import 'package:profind/features/home/presentation/pages/client_home_page.dart';
+import 'package:profind/features/client/presentation/pages/client_home_page.dart';
 import 'package:profind/features/service_providers/presentation/pages/service_provider_page.dart';
 
 class HomePage extends StatelessWidget {
