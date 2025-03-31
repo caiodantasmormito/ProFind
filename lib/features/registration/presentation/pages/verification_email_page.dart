@@ -144,9 +144,15 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
               TextButton(
                 onPressed: () {
                   FirebaseAuth.instance.signOut();
-                  context.pushReplacement(LoginPage.routeName);
+                  context.go(LoginPage.routeName);
                 },
-                child: const Text('Voltar para login'),
+                child: const Text(
+                  'Fazer login',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFFfa7f3b)),
+                ),
               ),
             ],
           ),

@@ -126,24 +126,27 @@ class _RegistrationPageState extends State<RegistrationPage> {
             : 'Cadastro de Prestador'),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            spacing: 16,
-            children: [
-              _buildNameField(),
-              _buildSurnameField(),
-              _buildCpfField(),
-              _buildPhoneField(),
-              if (widget.userType == 'service_provider') _buildServiceField(),
-              _buildCepField(),
-              _buildAddressField(),
-              _buildCityField(),
-              _buildUfField(),
-              const SizedBox(height: 24),
-              _buildContinueButton(),
-            ],
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              spacing: 16,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildNameField(),
+                _buildSurnameField(),
+                _buildCpfField(),
+                _buildPhoneField(),
+                if (widget.userType == 'service_provider') _buildServiceField(),
+                _buildCepField(),
+                _buildAddressField(),
+                _buildCityField(),
+                _buildUfField(),
+                const SizedBox(height: 24),
+                _buildContinueButton(),
+              ],
+            ),
           ),
         ),
       ),
