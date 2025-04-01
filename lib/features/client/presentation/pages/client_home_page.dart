@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:profind/features/login/presentation/pages/login_page.dart';
+import 'package:profind/features/chat/presentation/pages/chat_page.dart';
 import 'package:profind/features/service_providers/presentation/bloc/get_service_providers_bloc.dart';
 
 class ClientHomePage extends StatefulWidget {
@@ -175,7 +176,18 @@ class _ClientHomePageState extends State<ClientHomePage> {
                                   trailing: IconButton(
                                     icon: const Icon(Icons.chat,
                                         color: Color(0xFFfa7f3b)),
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ChatScreen(
+                                            providerId: serviceProvider.id!,
+                                            providerName:
+                                                '${serviceProvider.name} ${serviceProvider.surname}',
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                   title: Text(
                                     '${serviceProvider.name} '

@@ -13,3 +13,12 @@ class NoParams extends Equatable {
   @override
   List<Object?> get props => [];
 }
+
+abstract class VoidUseCase<Params> {
+  Future<(Failure?, void)> call(Params params);
+}
+
+
+abstract class StreamUseCase<ReturnType, Params> {
+  Stream<(Failure?, ReturnType)> call(Params params);
+}

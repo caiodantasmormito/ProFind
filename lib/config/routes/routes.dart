@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:profind/features/chat/core/chat_routes.dart';
 import 'package:profind/features/home/core/home_routes.dart';
 import 'package:profind/features/login/core/authenticate_routes.dart';
 import 'package:profind/features/login/presentation/pages/login_page.dart';
@@ -12,6 +13,7 @@ GoRouter router(SharedPreferences preferences) {
       ...AuthenticateRoutes.routes,
       ...HomeRoutes.routes,
       ...RegistrationRoutes.routes,
+      ...ChatRoutes.routes,
       
     ],
   );
