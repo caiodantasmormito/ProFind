@@ -10,7 +10,7 @@ void main() async {
   await setPreferences();
 
   await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform, name: "UEX");
+      options: DefaultFirebaseOptions.currentPlatform, name: "ProFind");
 
   runApp(AppWidget(preferences: preferences));
 }

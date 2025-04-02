@@ -5,7 +5,7 @@ abstract class GetChatEvent extends Equatable {
   const GetChatEvent();
 }
 
-class InitializeChat extends GetChatEvent {
+  class InitializeChat extends GetChatEvent {
   final String clientId;
   final String providerId;
 
@@ -16,4 +16,20 @@ class InitializeChat extends GetChatEvent {
 
   @override
   List<Object> get props => [clientId, providerId];
+}
+
+class NewSendMessage extends GetChatEvent {
+  final String chatId;
+  final String senderId;
+  final String text;
+
+  const NewSendMessage({
+    required this.chatId,
+    required this.senderId,
+    required this.text,
+  });
+  
+  @override
+  
+  List<Object?> get props => [chatId, senderId, text];
 }

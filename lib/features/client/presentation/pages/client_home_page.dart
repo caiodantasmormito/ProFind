@@ -6,6 +6,7 @@ import 'package:profind/features/login/presentation/pages/login_page.dart';
 import 'package:profind/features/chat/presentation/pages/chat_page.dart';
 import 'package:profind/features/service_providers/presentation/bloc/get_service_providers_bloc.dart';
 
+
 class ClientHomePage extends StatefulWidget {
   const ClientHomePage({super.key});
   static const String routeName = '/client';
@@ -177,6 +178,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
                                     icon: const Icon(Icons.chat,
                                         color: Color(0xFFfa7f3b)),
                                     onPressed: () {
+                                      
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(

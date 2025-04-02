@@ -9,7 +9,7 @@ class MessageModel extends MessageEntity {
     required super.senderId,
     required super.text,
     required super.timestamp,
-    //required super.read,
+    required super.read,
   });
 
   Map<String, dynamic> toMap() {
@@ -18,7 +18,7 @@ class MessageModel extends MessageEntity {
       'senderId': senderId,
       'text': text,
       'timestamp': timestamp,
-      //'read': read,
+      'read': read,
     };
   }
 
@@ -28,7 +28,7 @@ class MessageModel extends MessageEntity {
       senderId: senderId,
       text: text,
       timestamp: timestamp,
-      //read: read,
+      read: read,
     );
   }
 
@@ -39,7 +39,7 @@ class MessageModel extends MessageEntity {
         senderId: data['senderId'] ?? '',
         text: data['text'] ?? '',
         timestamp: data['timestamp'] ?? Timestamp.now(),
-        //read: data['read'] ?? ''
+        read: data['read'] ?? ''
         );
   }
 

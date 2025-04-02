@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+
 class UserTypeChecker extends StatelessWidget {
   final Widget clientHome;
   final Widget serviceProviderHome;
@@ -30,6 +31,7 @@ class UserTypeChecker extends StatelessWidget {
     return FutureBuilder<DocumentSnapshot>(
       future: _getUserDocument(user.uid),
       builder: (context, snapshot) {
+        
         if (snapshot.connectionState == ConnectionState.waiting) {
           return loadingWidget;
         }

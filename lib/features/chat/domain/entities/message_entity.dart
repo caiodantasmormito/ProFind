@@ -6,14 +6,14 @@ class MessageEntity extends Equatable {
   final String senderId;
   final String text;
   final Timestamp timestamp;
-  //final bool read;
+  final bool read;
 
   const MessageEntity({
     required this.id,
     required this.senderId,
     required this.text,
     required this.timestamp,
-    //required this.read,
+    required this.read,
   });
 
   @override
@@ -29,14 +29,14 @@ class MessageEntity extends Equatable {
     String? senderId,
     String? text,
     Timestamp? timestamp,
-    //bool? read,
+    bool? read,
   }) {
     return MessageEntity(
       id: id ?? this.id,
       senderId: senderId ?? this.senderId,
       text: text ?? this.text,
       timestamp: timestamp ?? this.timestamp,
-      //read: read ?? this.read,
+      read: read ?? this.read,
     );
   }
 }

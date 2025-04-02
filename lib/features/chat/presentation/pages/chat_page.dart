@@ -1,6 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:profind/features/chat/presentation/bloc/get_chats/get_chats_bloc.dart';
+import 'package:profind/features/chat/presentation/bloc/get_messages/get_messages_bloc.dart';
+import 'package:profind/features/chat/presentation/bloc/send_message/send_message_bloc.dart';
 
 class ChatScreen extends StatefulWidget {
   final String providerId;
@@ -13,188 +16,255 @@ class ChatScreen extends StatefulWidget {
   });
 
   static const String routeName = '/chat';
+
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final TextEditingController _messageController = TextEditingController();
-  String? _chatId;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  bool _isLoading = true;
+  late final TextEditingController _messageController;
+  late final String _currentUserId;
 
   @override
   void initState() {
     super.initState();
-    _initializeChat();
-  }
-
-  Future<void> _initializeChat() async {
-    try {
-      _chatId = await _getOrCreateChatId();
-    } catch (e) {
-      print('Erro ao inicializar chat: $e');
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao carregar conversa')),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
-  Future<String> _getOrCreateChatId() async {
-    final clientId = _auth.currentUser?.uid;
-    if (clientId == null) throw Exception('Usuário não autenticado');
-
-    final providerId = widget.providerId;
-
-    final query = await _firestore
-        .collection('chats')
-        .where('participants', arrayContains: clientId)
-        .get();
-
-    for (var doc in query.docs) {
-      if (doc['participants'].contains(providerId)) {
-        return doc.id;
-      }
-    }
-
-    final newChat = await _firestore.collection('chats').add({
-      'participants': [clientId, providerId],
-      'lastMessage': '',
-      'lastMessageTime': FieldValue.serverTimestamp(),
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-
-    return newChat.id;
-  }
-
-  Future<void> _sendMessage() async {
-    if (_messageController.text.trim().isEmpty || _chatId == null) return;
-
-    final message = _messageController.text.trim();
-    _messageController.clear();
-
-    try {
-      await _firestore.collection('messages/$_chatId/messages').add({
-        'senderId': _auth.currentUser!.uid,
-        'text': message,
-        'timestamp': FieldValue.serverTimestamp(),
-        'read': false,
-      });
-
-      await _firestore.collection('chats').doc(_chatId).update({
-        'lastMessage': message,
-        'lastMessageTime': FieldValue.serverTimestamp(),
-      });
-    } catch (e) {
-      print('Erro ao enviar mensagem: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao enviar mensagem')),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Text(widget.providerName),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _chatId == null
-                    ? const Center(child: Text('Erro ao carregar conversa'))
-                    : StreamBuilder<QuerySnapshot>(
-                        stream: _firestore
-                            .collection('messages/$_chatId/messages')
-                            .orderBy('timestamp', descending: false)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasError) {
-                            return Center(
-                                child: Text('Erro: ${snapshot.error}'));
-                          }
-
-                          if (!snapshot.hasData) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          }
-
-                          final messages = snapshot.data!.docs;
-
-                          return ListView.builder(
-                            itemCount: messages.length,
-                            itemBuilder: (context, index) {
-                              final message = messages[index];
-                              final isMe =
-                                  message['senderId'] == _auth.currentUser?.uid;
-
-                              return Align(
-                                alignment: isMe
-                                    ? Alignment.centerRight
-                                    : Alignment.centerLeft,
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      vertical: 4, horizontal: 16),
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: isMe
-                                        ? Colors.blue[100]
-                                        : Colors.grey[200],
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    message['text'],
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: InputDecoration(
-                      hintText: 'Digite sua mensagem...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    enabled: _chatId != null && !_isLoading,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed:
-                      _chatId == null || _isLoading ? null : _sendMessage,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+    _messageController = TextEditingController();
+    _currentUserId = FirebaseAuth.instance.currentUser!.uid;
   }
 
   @override
   void dispose() {
     _messageController.dispose();
     super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => ChatBloc(
+            getOrCreateChat: context.read(),
+            sendMessage: context.read(),
+            getMessages: context.read(),
+          )..add(InitializeChat(
+              clientId: _currentUserId,
+              providerId: widget.providerId,
+            )),
+        ),
+        BlocProvider(
+          create: (context) => GetMessagesBloc(
+            getMessagesUsecase: context.read(),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => SendMessageBloc(
+            sendMessageUsecase: context.read(),
+          ),
+        ),
+      ],
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          title: Text(widget.providerName),
+        ),
+        body: const _ChatView(),
+      ),
+    );
+  }
+}
+
+class _ChatView extends StatelessWidget {
+  const _ChatView();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(child: _MessagesList()),
+        const _MessageInput(),
+      ],
+    );
+  }
+}
+
+class _MessagesList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<ChatBloc, GetChatState>(
+      listener: (context, chatState) {
+        if (chatState is GetChatSuccess && context.mounted) {
+          context.read<GetMessagesBloc>().add(
+                LoadMessages(chatId: chatState.chatId.toString()),
+              );
+        }
+      },
+      builder: (context, chatState) {
+        if (chatState is GetChatLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (chatState is GetChatError) {
+          return Center(child: Text(chatState.message));
+        }
+
+        if (chatState is GetChatSuccess) {
+          return BlocBuilder<GetMessagesBloc, GetMessagesState>(
+            builder: (context, messagesState) {
+              if (messagesState is GetMessagesLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (messagesState is GetMessagesError) {
+                return Center(child: Text(messagesState.message));
+              }
+
+              if (messagesState is GetMessagesSuccess) {
+                return ListView.builder(
+                  reverse: true,
+                  itemCount: messagesState.messages.length,
+                  itemBuilder: (context, index) {
+                    final message = messagesState.messages[index];
+                    final isMe = message.senderId ==
+                        FirebaseAuth.instance.currentUser!.uid;
+
+                    return _MessageBubble(
+                      message: message.text,
+                      isMe: isMe,
+                    );
+                  },
+                );
+              }
+
+              return const Center(child: Text('Nenhuma mensagem encontrada'));
+            },
+          );
+        }
+
+        return const Center(child: CircularProgressIndicator());
+      },
+    );
+  }
+}
+
+class _MessageBubble extends StatelessWidget {
+  final String message;
+  final bool isMe;
+
+  const _MessageBubble({
+    required this.message,
+    required this.isMe,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isMe ? Colors.blue[100] : Colors.grey[200],
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          message,
+          style: const TextStyle(fontSize: 16),
+        ),
+      ),
+    );
+  }
+}
+
+class _MessageInput extends StatefulWidget {
+  const _MessageInput();
+
+  @override
+  State<_MessageInput> createState() => _MessageInputState();
+}
+
+class _MessageInputState extends State<_MessageInput> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentUserId = FirebaseAuth.instance.currentUser!.uid;
+
+    return BlocBuilder<ChatBloc, GetChatState>(
+      builder: (context, chatState) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _controller,
+                  decoration: InputDecoration(
+                    hintText: 'Digite sua mensagem...',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  enabled: chatState is GetChatSuccess,
+                ),
+              ),
+              BlocConsumer<SendMessageBloc, SendMessageState>(
+                listener: (context, state) {
+                  if (state is SendMessageSuccess) {
+                    _controller.clear();
+                    if (chatState is GetChatSuccess) {
+                      context.read<GetMessagesBloc>().add(
+                            LoadMessages(chatId: chatState.chatId.toString()),
+                          );
+                    }
+                  }
+
+                  if (state is SendMessageError && context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(state.message.toString())),
+                    );
+                  }
+                },
+                builder: (context, sendState) {
+                  final isLoading = sendState is SendMessageLoading;
+                  final isChatReady = chatState is GetChatSuccess;
+
+                  return IconButton(
+                    icon: isLoading
+                        ? const CircularProgressIndicator()
+                        : const Icon(Icons.send),
+                    onPressed: isLoading || !isChatReady
+                        ? null
+                        : () {
+                            if (_controller.text.trim().isEmpty) return;
+
+                            context.read<SendMessageBloc>().add(
+                                  SendMessage(
+                                    chatId: chatState.chatId.toString(),
+                                    text: _controller.text.trim(),
+                                    senderId: currentUserId,
+                                  ),
+                                );
+                          },
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

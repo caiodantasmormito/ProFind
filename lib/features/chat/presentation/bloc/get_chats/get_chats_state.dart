@@ -14,12 +14,13 @@ class GetChatLoading extends GetChatState {
 }
 
 class GetChatSuccess extends GetChatState {
-  final List<String> chatId;
+  final String chatId;
+  final List<MessageEntity> messages;
 
-  const GetChatSuccess({required this.chatId});
+  const GetChatSuccess({required this.chatId, required this.messages});
 
   @override
-  List<Object> get props => [chatId];
+  List<Object> get props => [chatId, messages];
 }
 
 class GetChatError extends GetChatState {

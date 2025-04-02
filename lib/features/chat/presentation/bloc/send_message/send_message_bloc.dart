@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:profind/core/domain/failure/failure.dart';
 import 'package:profind/features/chat/domain/usecase/send_message_usecase.dart';
 
 part 'send_message_event.dart';
@@ -18,20 +19,30 @@ class SendMessageBloc extends Bloc<SendMessageEvent, SendMessageState> {
     SendMessage event,
     Emitter<SendMessageState> emit,
   ) async {
-    emit(SendMessageLoading());
+    try {
+      if (isClosed) return;
 
-    final (failure, _) = await _sendMessageUsecase(
-      SendMessageParams(
-        chatId: event.chatId,
-        text: event.text,
-        senderId: event.senderId,
-      ),
-    );
+      emit(SendMessageLoading());
 
-    if (failure != null) {
-      emit(SendMessageError(message: failure.message));
-    } else {
-      emit(SendMessageSuccess());
+      final (Failure? failure, _) = await _sendMessageUsecase(
+        SendMessageParams(
+          chatId: event.chatId,
+          senderId: event.senderId,
+          text: event.text,
+        ),
+      );
+
+      if (isClosed) return;
+
+      if (failure != null) {
+        emit(SendMessageError(message: failure.message));
+      } else {
+        emit(SendMessageSuccess());
+      }
+    } catch (e) {
+      if (!isClosed) {
+        emit(SendMessageError(message: 'Erro inesperado: ${e.toString()}'));
+      }
     }
   }
 }

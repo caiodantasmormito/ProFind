@@ -2,10 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:profind/features/home/presentation/pages/new_home_page.dart';
+import 'package:profind/features/home/presentation/pages/home_page.dart';
 import 'package:profind/features/login/domain/usecase/authenticate_usecase.dart';
 import 'package:profind/features/login/presentation/bloc/authenticate_bloc.dart';
 import 'package:profind/features/registration/presentation/pages/personal_info_registration_page.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -261,6 +262,7 @@ class _LoginPageState extends State<LoginPage> {
       await user.reload();
 
       if (user.emailVerified) {
+        
         context.pushReplacement(HomePage.routeName);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

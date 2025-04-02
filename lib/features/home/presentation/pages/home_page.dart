@@ -23,10 +23,6 @@ class _HomePageState extends State<HomePage> {
     UserTypeChecker(
       clientHome: const ClientHomePage(),
       serviceProviderHome: const ServiceProviderHomePage(),
-    ),
-    UserTypeChecker(
-      clientHome: const ClientHomePage(),
-      serviceProviderHome: const ServiceProviderHomePage(),
     )
   ];
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:profind/core/domain/failure/failure.dart';
 import 'package:profind/features/chat/data/datasource/messages_datasource.dart';
 import 'package:profind/features/chat/domain/entities/chat_entity.dart';
@@ -12,34 +14,38 @@ class MessagesRepositoryImpl implements MessagesRepository {
       : _datasource = datasource;
 
   @override
-  Future<(Failure?, String?)> createChat(
-      String clientId, String providerId) async {
+  Future<(Failure?, String?)> getOrCreateChat(
+    String clientId,
+    String providerId,
+  ) async {
     try {
-      final chatId = await _datasource.createChat(clientId, providerId);
+      final chatId = await _datasource.getOrCreateChat(clientId, providerId);
       return (null, chatId);
-    } catch (e) {
+    } on Exception catch (e) {
       return (
-        MessagesFailure(
-          message: 'Failed to create chat',
-        ),
+        MessagesFailure(message: e.toString()),
         null,
       );
     }
   }
 
   @override
-  Future<(Failure?, void)> sendMessage(
-      {required String chatId,
-      required String senderId,
-      required String text}) async {
+  Future<(Failure?, void)> sendMessage({
+    required String chatId,
+    required String senderId,
+    required String text,
+  }) async {
     try {
       await _datasource.sendMessage(
-          chatId: chatId, senderId: senderId, text: text);
+        chatId: chatId,
+        senderId: senderId,
+        text: text,
+      );
       return (null, null);
-    } catch (e) {
+    } on Exception catch (e) {
       return (
         MessagesFailure(
-          message: 'Failed to send message',
+          message: e.toString(),
         ),
         null,
       );
@@ -48,38 +54,59 @@ class MessagesRepositoryImpl implements MessagesRepository {
 
   @override
   Stream<(Failure?, List<MessageEntity>?)> getChatMessages(String chatId) {
-    return _datasource.getChatMessages(chatId).asyncExpand((models) {
+    return _datasource.getMessages(chatId).transform(
+          StreamTransformer.fromHandlers(
+            handleData: (models, sink) {
+              try {
+                final entities =
+                    models.map((model) => model.toEntity()).toList();
+                sink.add((null, entities));
+              } catch (e) {
+                sink.addError((
+                  MessagesFailure(
+                    message: e.toString(),
+                  ),
+                  null,
+                ));
+              }
+            },
+            handleError: (error, stackTrace, sink) {
+              sink.add((
+                MessagesFailure(
+                  message: error.toString(),
+                ),
+                null,
+              ));
+            },
+          ),
+        );
+  }
+
+  @override
+  Stream<(Failure?, List<ChatEntity>?)> getUserChats(String userId) {
+    return _datasource.getUserChats(userId).asyncMap((models) {
       try {
-        final entities = models.map((model) => model.toEntity()).toList();
-        return Stream.value((null, entities));
+        final entities = models
+            .map((model) => ChatEntity(
+                  id: model.id,
+                  participants: model.participants,
+                  lastMessage: model.lastMessage,
+                  lastMessageTime: model.lastMessageTime,
+                  createdAt: model.createdAt,
+                ))
+            .toList();
+        return (null, entities);
       } catch (e) {
-        return Stream.value((
+        return (
           MessagesFailure(message: 'Conversion error: ${e.toString()}'),
-          null
-        ));
+          null,
+        );
       }
     }).handleError((error) {
       return (
-        MessagesFailure(message: 'Repository error: ${error.toString()}'),
-        null
+        MessagesFailure(message: 'Stream error: ${error.toString()}'),
+        null,
       );
     });
-  }
-
-    @override
-  Future<(Failure?, List<MessageEntity>?)> getUserChats(String userId) async {
-    try {
-      final models = await _datasource.getUserChats(userId);
-      final entities = models.map((model) => model.toEntity()).toList();
-      return (null, entities);
-    } catch (e) {
-      return (
-        MessagesFailure(
-          message: 'Erro ao buscar conversas: ${e.toString()}',
-          
-        ),
-        <MessageEntity>[],
-      );
-    }
   }
 }
