@@ -12,17 +12,42 @@ class ChatDatasourceImpl implements ChatDatasource {
   Future<String> getOrCreateChat(String clientId, String providerId) async {
     final query = await _firestore
         .collection('chats')
-        .where('participants', arrayContains: clientId)
+        .where('participantsIds', arrayContains: clientId)
         .get();
 
     for (var doc in query.docs) {
-      if (doc['participants'].contains(providerId)) {
+      if (doc['participantsIds'].contains(providerId)) {
         return doc.id;
       }
     }
 
+    final clientDoc =
+        await _firestore.collection('clients').doc(clientId).get();
+    final providerDoc =
+        await _firestore.collection('service_providers').doc(providerId).get();
+
+    final clientData = clientDoc.data();
+    final providerData = providerDoc.data();
+
+    final clientName = clientData?['name'] ?? 'Usuário';
+    final clientSurname = clientData?['surname'] ?? '';
+    final providerName = providerData?['name'] ?? 'Usuário';
+    final providerSurname = providerData?['surname'] ?? '';
+
     final newChat = await _firestore.collection('chats').add({
-      'participants': [clientId, providerId],
+      'participantsIds': [clientId, providerId],
+      'participants': [
+        {
+          'id': clientId,
+          'name': clientName,
+          'surname': clientSurname,
+        },
+        {
+          'id': providerId,
+          'name': providerName,
+          'surname': providerSurname,
+        },
+      ],
       'lastMessage': '',
       'lastMessageTime': FieldValue.serverTimestamp(),
       'createdAt': FieldValue.serverTimestamp(),
@@ -71,20 +96,31 @@ class ChatDatasourceImpl implements ChatDatasource {
     try {
       return _firestore
           .collection('chats')
-          .where('participants', arrayContains: userId)
+          .where('participantsIds', arrayContains: userId)
           .snapshots()
           .map((snapshot) {
         if (snapshot.docs.isEmpty) return <ChatModel>[];
 
-        
         final chats = snapshot.docs.map((doc) {
           final data = doc.data();
+
+          final participants =
+              List<Map<String, dynamic>>.from(data['participants']);
+
+          final otherUser = participants.firstWhere(
+            (p) => p['id'] != userId,
+            orElse: () => {},
+          );
+
           return ChatModel(
             id: doc.id,
-            participants: List<String>.from(data['participants']),
+            participants: participants.map((p) => p['id'].toString()).toList(),
             lastMessage: data['lastMessage'] ?? '',
             lastMessageTime: data['lastMessageTime'] ?? Timestamp.now(),
             createdAt: data['createdAt'] ?? Timestamp.now(),
+            otherUserName: otherUser.isNotEmpty
+                ? "${otherUser['name']} ${otherUser['surname']}"
+                : 'Usuário desconhecido',
           );
         }).toList();
 

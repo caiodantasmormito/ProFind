@@ -24,25 +24,12 @@ class _ListChatsPageState extends State<ListChatsPage> {
     }
   }
 
-  Future<String> _getUserName(String userId) async {
-    try {
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
-      if (doc.exists) {
-        return doc.data()?['name'] ?? 'Usuário desconhecido';
-      }
-    } catch (e) {
-      debugPrint("Erro ao buscar nome do usuário: $e");
-    }
-    return 'Usuário desconhecido';
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: Colors.white,
         title: const Text('Minhas Conversas'),
       ),
       body: BlocBuilder<GetUserChatsBloc, GetUserChatsState>(
@@ -86,10 +73,18 @@ class _ListChatsPageState extends State<ListChatsPage> {
                             : 'Carregando...';
 
                     return Card(
+                      color: Colors.white,
+                      elevation: 3,
                       margin: const EdgeInsets.symmetric(
                           vertical: 8, horizontal: 16),
                       child: ListTile(
-                        title: Text(userName),
+                        title: Text(
+                          userName,
+                          style: TextStyle(
+                              color: Color(0xFFfa7f3b),
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold),
+                        ),
                         subtitle: Text(chat.lastMessage),
                         trailing:
                             Text(_formatDate(chat.lastMessageTime.toDate())),
@@ -115,5 +110,43 @@ class _ListChatsPageState extends State<ListChatsPage> {
 
   String _formatDate(DateTime date) {
     return '${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+  }
+
+  Future<String> _getUserName(String userId) async {
+    try {
+      var doc = await FirebaseFirestore.instance
+          .collection('clients')
+          .doc(userId)
+          .get();
+      if (doc.exists) {
+        final data = doc.data();
+        if (data != null) {
+          final name = data['name'] as String? ?? '';
+          final surname = data['surname'] as String? ?? '';
+          return name.isNotEmpty || surname.isNotEmpty
+              ? '$name $surname'
+              : 'Usuário desconhecido';
+        }
+      }
+
+      doc = await FirebaseFirestore.instance
+          .collection('service_providers')
+          .doc(userId)
+          .get();
+      if (doc.exists) {
+        final data = doc.data();
+        if (data != null) {
+          final name = data['name'] as String? ?? '';
+          final surname = data['surname'] as String? ?? '';
+          return name.isNotEmpty || surname.isNotEmpty
+              ? '$name $surname'
+              : 'Usuário desconhecido';
+        }
+      }
+    } catch (e) {
+      debugPrint("Erro ao buscar nome do usuário: $e");
+    }
+
+    return 'Usuário desconhecido';
   }
 }

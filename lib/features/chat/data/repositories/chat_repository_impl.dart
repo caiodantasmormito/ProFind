@@ -115,6 +115,7 @@ class ChatRepositoryImpl implements ChatRepository {
       lastMessage: model.lastMessage,
       lastMessageTime: model.lastMessageTime,
       createdAt: model.createdAt,
+      otherUserName: model.otherUserName,
     );
   }
 }

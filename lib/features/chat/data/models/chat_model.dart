@@ -9,7 +9,8 @@ class ChatModel extends ChatEntity {
       required super.participants,
       required super.lastMessage,
       required super.lastMessageTime,
-      required super.createdAt});
+      required super.createdAt,
+      required super.otherUserName});
 
   Map<String, dynamic> toMap() {
     return {
@@ -18,10 +19,12 @@ class ChatModel extends ChatEntity {
       'lastMessage': lastMessage,
       'lastMessageTime': lastMessageTime,
       'createdAt': createdAt,
+      'otherUserName': otherUserName,
     };
   }
   ChatEntity toEntity() {
     return ChatEntity(
+      otherUserName: otherUserName,
       id: id,
       participants: participants,
       lastMessage: lastMessage,
@@ -38,6 +41,7 @@ class ChatModel extends ChatEntity {
       lastMessage: data['lastMessage'] ?? '',
       lastMessageTime: data['lastMessageTime'] ?? Timestamp.now(),
       createdAt: data['createdAt'] ?? Timestamp.now(),
+      otherUserName: data['otherUserName'] ?? '',
     );
   }
 

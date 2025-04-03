@@ -8,6 +8,7 @@ class ChatEntity extends Equatable {
   final String lastMessage;
   final Timestamp lastMessageTime;
   final Timestamp createdAt;
+  final String otherUserName;
 
   const ChatEntity({
     required this.id,
@@ -15,6 +16,7 @@ class ChatEntity extends Equatable {
     required this.lastMessage,
     required this.lastMessageTime,
     required this.createdAt,
+    required this.otherUserName,
   });
 
   @override
@@ -24,6 +26,7 @@ class ChatEntity extends Equatable {
         lastMessage,
         lastMessageTime,
         createdAt,
+        otherUserName,
       ];
 
   ChatEntity copyWith({
@@ -34,6 +37,7 @@ class ChatEntity extends Equatable {
     Timestamp? lastMessageTime,
   }) {
     return ChatEntity(
+      otherUserName: otherUserName,
         id: id ?? this.id,
         participants: participants ?? this.participants,
         lastMessage: lastMessage ?? this.lastMessage,
@@ -43,6 +47,7 @@ class ChatEntity extends Equatable {
 
   ChatModel toModel() => ChatModel(
       participants: participants,
+      otherUserName: otherUserName,
       id: id,
       lastMessage: lastMessage,
       createdAt: createdAt,
