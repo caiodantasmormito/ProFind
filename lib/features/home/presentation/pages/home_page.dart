@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:profind/features/chat/presentation/bloc/get_user_chats/get_user_chats_bloc.dart';
+import 'package:profind/features/chat/presentation/pages/list_chats_page.dart';
 import 'package:profind/features/client/presentation/pages/client_home_page.dart';
 import 'package:profind/features/home/core/user_type_check.dart';
 import 'package:profind/features/service_providers/presentation/pages/service_provider_page.dart';
@@ -19,6 +22,12 @@ class _HomePageState extends State<HomePage> {
     UserTypeChecker(
       clientHome: const ClientHomePage(),
       serviceProviderHome: const ServiceProviderHomePage(),
+    ),
+    BlocProvider(
+      create: (context) => GetUserChatsBloc(
+        getUserChatsUsecase: context.read(),
+      ),
+      child: ListChatsPage(),
     ),
     UserTypeChecker(
       clientHome: const ClientHomePage(),

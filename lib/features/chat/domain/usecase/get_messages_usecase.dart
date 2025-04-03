@@ -4,9 +4,9 @@ import 'package:profind/features/chat/domain/entities/message_entity.dart';
 import 'package:profind/features/chat/domain/repositories/messages_repository.dart';
 
 class GetMessagesUsecase implements StreamUseCase<List<MessageEntity>, String> {
-  final MessagesRepository _repository;
+  final ChatRepository _repository;
 
-  GetMessagesUsecase({required MessagesRepository repository})
+  GetMessagesUsecase({required ChatRepository repository})
       : _repository = repository;
 
   @override

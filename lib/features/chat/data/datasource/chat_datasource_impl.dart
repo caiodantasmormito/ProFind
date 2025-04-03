@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:profind/features/chat/data/datasource/messages_datasource.dart';
+import 'package:profind/features/chat/data/datasource/chat_datasource.dart';
 import 'package:profind/features/chat/data/models/chat_model.dart';
 import 'package:profind/features/chat/data/models/message_model.dart';
 
-class MessagesDatasourceImpl implements MessagesDatasource {
+class ChatDatasourceImpl implements ChatDatasource {
   final FirebaseFirestore _firestore;
 
-  MessagesDatasourceImpl(this._firestore);
+  ChatDatasourceImpl(this._firestore);
 
   @override
   Future<String> getOrCreateChat(String clientId, String providerId) async {
@@ -68,12 +68,32 @@ class MessagesDatasourceImpl implements MessagesDatasource {
 
   @override
   Stream<List<ChatModel>> getUserChats(String userId) {
-    return _firestore
-        .collection('chats')
-        .where('participants', arrayContains: userId)
-        .orderBy('lastMessageTime', descending: true)
-        .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => ChatModel.fromFirestore(doc)).toList());
+    try {
+      return _firestore
+          .collection('chats')
+          .where('participants', arrayContains: userId)
+          .snapshots()
+          .map((snapshot) {
+        if (snapshot.docs.isEmpty) return <ChatModel>[];
+
+        
+        final chats = snapshot.docs.map((doc) {
+          final data = doc.data();
+          return ChatModel(
+            id: doc.id,
+            participants: List<String>.from(data['participants']),
+            lastMessage: data['lastMessage'] ?? '',
+            lastMessageTime: data['lastMessageTime'] ?? Timestamp.now(),
+            createdAt: data['createdAt'] ?? Timestamp.now(),
+          );
+        }).toList();
+
+        // Ordenação manual
+        chats.sort((a, b) => b.lastMessageTime.compareTo(a.lastMessageTime));
+        return chats;
+      });
+    } catch (e) {
+      throw Exception('Chat datasource error: ${e.toString()}');
+    }
   }
 }

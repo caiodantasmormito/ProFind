@@ -3,9 +3,9 @@ import 'package:profind/core/domain/usecase/usecase.dart';
 import 'package:profind/features/chat/domain/repositories/messages_repository.dart';
 
 class GetOrCreateChatUsecase implements UseCase<String, CreateChatParams> {
-  final MessagesRepository _repository;
+  final ChatRepository _repository;
 
-  GetOrCreateChatUsecase({required MessagesRepository repository})
+  GetOrCreateChatUsecase({required ChatRepository repository})
       : _repository = repository;
 
   @override

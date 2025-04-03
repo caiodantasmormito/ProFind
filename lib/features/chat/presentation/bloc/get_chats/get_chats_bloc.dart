@@ -73,7 +73,7 @@ class ChatBloc extends Bloc<GetChatEvent, GetChatState> {
       }
     } catch (e) {
       emit(GetChatError(message: e.toString()));
-      // Retorna ao estado anterior após mostrar o erro
+      
       if (state is GetChatSuccess) {
         emit(state as GetChatSuccess);
       }

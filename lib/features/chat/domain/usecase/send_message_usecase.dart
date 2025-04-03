@@ -3,9 +3,9 @@ import 'package:profind/core/domain/usecase/usecase.dart';
 import 'package:profind/features/chat/domain/repositories/messages_repository.dart';
 
 class SendMessageUsecase implements VoidUseCase<SendMessageParams> {
-  final MessagesRepository _repository;
+  final ChatRepository _repository;
 
-  SendMessageUsecase({required MessagesRepository repository})
+  SendMessageUsecase({required ChatRepository repository})
       : _repository = repository;
 
   @override

@@ -50,6 +50,7 @@ class _ChatScreenState extends State<ChatScreen> {
           )..add(InitializeChat(
               clientId: _currentUserId,
               providerId: widget.providerId,
+              providerName: widget.providerName,
             )),
         ),
         BlocProvider(

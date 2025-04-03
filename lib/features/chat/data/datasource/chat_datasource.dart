@@ -1,7 +1,7 @@
 import 'package:profind/features/chat/data/models/chat_model.dart';
 import 'package:profind/features/chat/data/models/message_model.dart';
 
-abstract class MessagesDatasource {
+abstract class ChatDatasource {
   Future<String> getOrCreateChat(String clientId, String providerId);
   Future<void> sendMessage({
     required String chatId,

@@ -1,16 +1,17 @@
 import 'dart:async';
 
 import 'package:profind/core/domain/failure/failure.dart';
-import 'package:profind/features/chat/data/datasource/messages_datasource.dart';
+import 'package:profind/features/chat/data/datasource/chat_datasource.dart';
+import 'package:profind/features/chat/data/models/chat_model.dart';
 import 'package:profind/features/chat/domain/entities/chat_entity.dart';
 import 'package:profind/features/chat/domain/entities/message_entity.dart';
 import 'package:profind/features/chat/domain/failures/failures.dart';
 import 'package:profind/features/chat/domain/repositories/messages_repository.dart';
 
-class MessagesRepositoryImpl implements MessagesRepository {
-  final MessagesDatasource _datasource;
+class ChatRepositoryImpl implements ChatRepository {
+  final ChatDatasource _datasource;
 
-  MessagesRepositoryImpl({required MessagesDatasource datasource})
+  ChatRepositoryImpl({required ChatDatasource datasource})
       : _datasource = datasource;
 
   @override
@@ -84,29 +85,36 @@ class MessagesRepositoryImpl implements MessagesRepository {
 
   @override
   Stream<(Failure?, List<ChatEntity>?)> getUserChats(String userId) {
-    return _datasource.getUserChats(userId).asyncMap((models) {
-      try {
-        final entities = models
-            .map((model) => ChatEntity(
-                  id: model.id,
-                  participants: model.participants,
-                  lastMessage: model.lastMessage,
-                  lastMessageTime: model.lastMessageTime,
-                  createdAt: model.createdAt,
-                ))
-            .toList();
-        return (null, entities);
-      } catch (e) {
-        return (
-          MessagesFailure(message: 'Conversion error: ${e.toString()}'),
-          null,
+    return _datasource.getUserChats(userId).transform(
+          StreamTransformer.fromHandlers(
+            handleData: (List<ChatModel> models, sink) {
+              try {
+                final entities = models.map(_convertModelToEntity).toList();
+                sink.add((null, entities));
+              } catch (e) {
+                sink.add((
+                  MessagesFailure(message: 'Conversion error: ${e.toString()}'),
+                  null,
+                ));
+              }
+            },
+            handleError: (error, stackTrace, sink) {
+              sink.add((
+                MessagesFailure(message: 'Stream error: ${error.toString()}'),
+                null,
+              ));
+            },
+          ),
         );
-      }
-    }).handleError((error) {
-      return (
-        MessagesFailure(message: 'Stream error: ${error.toString()}'),
-        null,
-      );
-    });
+  }
+
+  ChatEntity _convertModelToEntity(ChatModel model) {
+    return ChatEntity(
+      id: model.id,
+      participants: model.participants,
+      lastMessage: model.lastMessage,
+      lastMessageTime: model.lastMessageTime,
+      createdAt: model.createdAt,
+    );
   }
 }
