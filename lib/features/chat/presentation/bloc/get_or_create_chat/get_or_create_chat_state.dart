@@ -1,4 +1,4 @@
-part of 'get_chats_bloc.dart';
+part of 'get_or_create_chat_bloc.dart';
 abstract class GetChatState extends Equatable {
   const GetChatState();
 }

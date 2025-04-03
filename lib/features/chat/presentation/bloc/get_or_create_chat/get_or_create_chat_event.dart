@@ -1,10 +1,10 @@
-part of 'get_chats_bloc.dart';
+part of 'get_or_create_chat_bloc.dart';
 
-abstract class GetChatEvent extends Equatable {
-  const GetChatEvent();
+abstract class GetOrCreateChatEvent extends Equatable {
+  const GetOrCreateChatEvent();
 }
 
-class InitializeChat extends GetChatEvent {
+class InitializeChat extends GetOrCreateChatEvent {
   final String clientId;
   final String providerId;
   final String providerName;
@@ -19,7 +19,7 @@ class InitializeChat extends GetChatEvent {
   List<Object> get props => [clientId, providerId];
 }
 
-class NewSendMessage extends GetChatEvent {
+class NewSendMessage extends GetOrCreateChatEvent {
   final String chatId;
   final String senderId;
   final String text;

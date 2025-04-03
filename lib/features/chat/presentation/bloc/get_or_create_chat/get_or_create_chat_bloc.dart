@@ -6,15 +6,15 @@ import 'package:profind/features/chat/domain/usecase/get_messages_usecase.dart';
 import 'package:profind/features/chat/domain/usecase/get_or_create_chat_usecase.dart';
 import 'package:profind/features/chat/domain/usecase/send_message_usecase.dart';
 
-part 'get_chats_event.dart';
-part 'get_chats_state.dart';
+part 'get_or_create_chat_event.dart';
+part 'get_or_create_chat_state.dart';
 
-class ChatBloc extends Bloc<GetChatEvent, GetChatState> {
+class GetOrCreateChatBloc extends Bloc<GetOrCreateChatEvent, GetChatState> {
   final GetOrCreateChatUsecase _getOrCreateChat;
   final SendMessageUsecase _sendMessage;
   final GetMessagesUsecase _getMessages;
 
-  ChatBloc({
+  GetOrCreateChatBloc({
     required GetOrCreateChatUsecase getOrCreateChat,
     required SendMessageUsecase sendMessage,
     required GetMessagesUsecase getMessages,

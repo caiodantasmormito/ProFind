@@ -4,8 +4,8 @@ import 'package:profind/features/chat/domain/usecase/get_messages_usecase.dart';
 import 'package:profind/features/chat/domain/usecase/get_or_create_chat_usecase.dart';
 import 'package:profind/features/chat/domain/usecase/get_user_chats_usecase.dart';
 import 'package:profind/features/chat/domain/usecase/send_message_usecase.dart';
-import 'package:profind/features/chat/presentation/bloc/get_chats/get_chats_bloc.dart';
 import 'package:profind/features/chat/presentation/bloc/get_messages/get_messages_bloc.dart';
+import 'package:profind/features/chat/presentation/bloc/get_or_create_chat/get_or_create_chat_bloc.dart';
 import 'package:profind/features/chat/presentation/bloc/get_user_chats/get_user_chats_bloc.dart';
 import 'package:profind/features/chat/presentation/bloc/send_message/send_message_bloc.dart';
 import 'package:profind/features/chat/presentation/pages/chat_page.dart';
@@ -17,8 +17,8 @@ sealed class ChatRoutes {
       path: ChatScreen.routeName,
       builder: (context, state) => MultiBlocProvider(
         providers: [
-          BlocProvider<ChatBloc>(
-            create: (context) => ChatBloc(
+          BlocProvider<GetOrCreateChatBloc>(
+            create: (context) => GetOrCreateChatBloc(
               getOrCreateChat: context.read<GetOrCreateChatUsecase>(),
               sendMessage: context.read<SendMessageUsecase>(),
               getMessages: context.read<GetMessagesUsecase>(),
@@ -45,8 +45,8 @@ sealed class ChatRoutes {
       path: ListChatsPage.routeName,
       builder: (context, state) => MultiBlocProvider(
         providers: [
-          BlocProvider<ChatBloc>(
-            create: (context) => ChatBloc(
+          BlocProvider<GetOrCreateChatBloc>(
+            create: (context) => GetOrCreateChatBloc(
               getOrCreateChat: context.read<GetOrCreateChatUsecase>(),
               sendMessage: context.read<SendMessageUsecase>(),
               getMessages: context.read<GetMessagesUsecase>(),

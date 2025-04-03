@@ -89,10 +89,9 @@ class _ListChatsPageState extends State<ListChatsPage> {
                         trailing:
                             Text(_formatDate(chat.lastMessageTime.toDate())),
                         onTap: () {
-                          // Navegar para a tela de chat específico
-                          // Navigator.push(context, MaterialPageRoute(
-                          //   builder: (_) => ChatScreen(chatId: chat.id),
-                          // ));
+                          /*Navigator.push(context, MaterialPageRoute(
+                            builder: (_) => ChatScreen(chatId: chat.id),
+                          ));*/
                         },
                       ),
                     );

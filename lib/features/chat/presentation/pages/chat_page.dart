@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:profind/features/chat/presentation/bloc/get_chats/get_chats_bloc.dart';
 import 'package:profind/features/chat/presentation/bloc/get_messages/get_messages_bloc.dart';
+import 'package:profind/features/chat/presentation/bloc/get_or_create_chat/get_or_create_chat_bloc.dart';
 import 'package:profind/features/chat/presentation/bloc/send_message/send_message_bloc.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -43,7 +43,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => ChatBloc(
+          create: (context) => GetOrCreateChatBloc(
             getOrCreateChat: context.read(),
             sendMessage: context.read(),
             getMessages: context.read(),
@@ -92,7 +92,7 @@ class _ChatView extends StatelessWidget {
 class _MessagesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ChatBloc, GetChatState>(
+    return BlocConsumer<GetOrCreateChatBloc, GetChatState>(
       listener: (context, chatState) {
         if (chatState is GetChatSuccess && context.mounted) {
           context.read<GetMessagesBloc>().add(
@@ -203,7 +203,7 @@ class _MessageInputState extends State<_MessageInput> {
   Widget build(BuildContext context) {
     final currentUserId = FirebaseAuth.instance.currentUser!.uid;
 
-    return BlocBuilder<ChatBloc, GetChatState>(
+    return BlocBuilder<GetOrCreateChatBloc, GetChatState>(
       builder: (context, chatState) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32),
