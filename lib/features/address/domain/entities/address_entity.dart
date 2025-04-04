@@ -5,12 +5,14 @@ class AddressEntity extends Equatable {
   final String logradouro;
   final String bairro;
   final String uf;
+  final String cidade;
 
   const AddressEntity({
     required this.cep,
     required this.logradouro,
     required this.uf,
     required this.bairro,
+    required this.cidade,
   });
 
   @override
@@ -19,5 +21,6 @@ class AddressEntity extends Equatable {
         logradouro,
         bairro,
         uf,
+        cidade,
       ];
 }

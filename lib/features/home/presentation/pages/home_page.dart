@@ -1,9 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:profind/features/chat/presentation/bloc/get_user_chats/get_user_chats_bloc.dart';
 import 'package:profind/features/chat/presentation/pages/list_chats_page.dart';
 import 'package:profind/features/client/presentation/pages/client_home_page.dart';
 import 'package:profind/features/home/core/user_type_check.dart';
+import 'package:profind/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:profind/features/profile/presentation/pages/profile_page.dart';
 import 'package:profind/features/service_providers/presentation/pages/service_provider_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -29,9 +33,12 @@ class _HomePageState extends State<HomePage> {
       ),
       child: ListChatsPage(),
     ),
-    UserTypeChecker(
-      clientHome: const ClientHomePage(),
-      serviceProviderHome: const ServiceProviderHomePage(),
+    BlocProvider(
+      create: (context) => ProfileBloc(
+        auth: FirebaseAuth.instance,
+        firestore: FirebaseFirestore.instance,
+      ),
+      child: ProfilePage(),
     )
   ];
 

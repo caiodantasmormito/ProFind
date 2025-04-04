@@ -7,6 +7,7 @@ import 'package:profind/core/infra/http_client.dart';
 import 'package:profind/features/address/core/get_address_provider.dart';
 import 'package:profind/features/chat/core/messages_provider.dart';
 import 'package:profind/features/login/core/authenticate_provider.dart';
+import 'package:profind/features/profile/core/profile_provider.dart';
 import 'package:profind/features/registration/core/registration_provider.dart';
 import 'package:profind/features/service_providers/core/service_providers_provider.dart';
 import 'package:provider/provider.dart';
@@ -36,6 +37,7 @@ class AppWidget extends StatelessWidget {
           ...MessagesInject.providers,
           ...AddressInject.providers,
           ...ServiceProvidersInject.providers,
+          ...ProfileInject.providers
         ],
         child: MaterialApp.router(
           title: 'ProFind',

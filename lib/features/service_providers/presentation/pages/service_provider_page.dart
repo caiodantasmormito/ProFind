@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:profind/features/login/presentation/pages/login_page.dart';
+import 'package:profind/core/widgets/profind_button.dart';
 
 class ServiceProviderHomePage extends StatelessWidget {
   const ServiceProviderHomePage({super.key});
@@ -32,25 +33,24 @@ class ServiceProviderHomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Bem-vindo, Prestador!',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text('Editar Meu Perfil'),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text('Meus Agendamentos'),
-            ),
-          ],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Center(
+          child: Column(
+            spacing: 20,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Bem-vindo, Prestador!',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              InkWell(
+                  onTap: () {}, child: ProfindButton(label: 'Editar perfil')),
+              InkWell(
+                  onTap: () {},
+                  child: ProfindButton(label: 'Meus agendamentos')),
+            ],
+          ),
         ),
       ),
     );

@@ -25,6 +25,7 @@ class EmailVerificationPage extends StatefulWidget {
 class _EmailVerificationPageState extends State<EmailVerificationPage> {
   bool _isLoading = false;
   Timer? _timer;
+  bool _isDisposed = false;
 
   @override
   void initState() {
@@ -34,56 +35,94 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
 
   @override
   void dispose() {
-    _timer?.cancel();
-    _startVerificationTimer();
+    _isDisposed = true;
+    if (_timer != null) {
+      _timer!.cancel();
+      _timer = null;
+    }
     super.dispose();
   }
 
   void _startVerificationTimer() {
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+      if (_isDisposed) {
+        timer.cancel();
+        return;
+      }
+
       try {
-        await context
-            .read<RegistrationDataSource>()
-            .checkAndUpdateEmailVerification(widget.userId);
+        if (!mounted) return;
+
+        final dataSource = context.read<RegistrationDataSource>();
+        await dataSource.checkAndUpdateEmailVerification(widget.userId);
+
+        if (_isDisposed) return;
 
         final user = FirebaseAuth.instance.currentUser;
         if (user != null && user.emailVerified) {
-          _timer?.cancel();
-          if (mounted) {
-            context.go(LoginPage.routeName);
-          }
+          timer.cancel();
+          if (!mounted) return;
+          
+          // Navegando de forma segura
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              context.go(LoginPage.routeName);
+            }
+          });
         }
       } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text('Erro ao verificar e-mail: ${e.toString()}')),
-          );
-        }
+        if (!mounted || _isDisposed) return;
+        
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Erro ao verificar e-mail: ${e.toString()}'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        });
       }
     });
   }
 
   Future<void> _resendVerificationEmail() async {
+    if (_isDisposed) return;
+
     setState(() => _isLoading = true);
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null && !user.emailVerified) {
         await user.sendEmailVerification();
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('E-mail de verificação reenviado!')),
-          );
-        }
+        if (!mounted || _isDisposed) return;
+        
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('E-mail de verificação reenviado!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+        });
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao reenviar e-mail: ${e.toString()}')),
-        );
-      }
+      if (!mounted || _isDisposed) return;
+      
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erro ao reenviar e-mail: ${e.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      });
     } finally {
-      if (mounted) {
+      if (mounted && !_isDisposed) {
         setState(() => _isLoading = false);
       }
     }

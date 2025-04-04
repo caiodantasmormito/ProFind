@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:profind/features/registration/data/models/user_model.dart';
 
@@ -64,4 +65,61 @@ class UserEntity extends Equatable {
         service: service,
         userType: userType,
       );
+
+  // Novo método factory para criar uma instância a partir do Firestore
+  factory UserEntity.fromFirestore(
+    DocumentSnapshot doc, {
+    required String userType,
+  }) {
+    final data = doc.data() as Map<String, dynamic>;
+    
+    return UserEntity(
+      id: doc.id,
+      emailVerified: data['emailVerified'] ?? false,
+      name: data['name'] ?? '',
+      surname: data['surname'] ?? '',
+      cpf: data['cpf'] ?? '',
+      email: data['email'] ?? '',
+      city: data['city'] ?? '',
+      uf: data['uf'] ?? '',
+      cep: data['cep'] ?? '',
+      phone: data['phone'] ?? '',
+      address: data['address'] ?? '',
+      service: data['service'],
+      userType: userType,
+    );
+  }
+
+  // Método de cópia com modificações
+  UserEntity copyWith({
+    String? id,
+    String? name,
+    String? surname,
+    String? cpf,
+    String? email,
+    String? city,
+    String? uf,
+    String? cep,
+    String? phone,
+    String? address,
+    String? service,
+    String? userType,
+    bool? emailVerified,
+  }) {
+    return UserEntity(
+      id: id ?? this.id,
+      emailVerified: emailVerified ?? this.emailVerified,
+      name: name ?? this.name,
+      surname: surname ?? this.surname,
+      cpf: cpf ?? this.cpf,
+      email: email ?? this.email,
+      city: city ?? this.city,
+      uf: uf ?? this.uf,
+      cep: cep ?? this.cep,
+      phone: phone ?? this.phone,
+      address: address ?? this.address,
+      service: service ?? this.service,
+      userType: userType ?? this.userType,
+    );
+  }
 }

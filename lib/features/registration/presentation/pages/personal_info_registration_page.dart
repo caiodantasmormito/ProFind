@@ -1,9 +1,10 @@
 import 'package:cpf_cnpj_validator/cpf_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:profind/arguments/validate_email_arguments.dart';
-import 'package:profind/features/registration/presentation/pages/email_registraion_page.dart';
+import 'package:profind/features/address/presentation/bloc/get_address_bloc.dart';
+import 'package:profind/features/registration/presentation/pages/address_registration_page.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key, required this.userType});
@@ -16,35 +17,25 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
+  late final GetAddressBloc _addressBloc;
   final List<String> _selectedServices = [];
   late final GlobalKey<FormState> _formKey;
   late final TextEditingController _nameController;
   late final TextEditingController _surnameController;
   late final TextEditingController _cpfController;
   late final TextEditingController _phoneController;
-  late final TextEditingController _addressController;
-  late final TextEditingController _cityController;
-  late final TextEditingController _cepController;
-  late final TextEditingController _ufController;
+
   late final TextEditingController _serviceController;
 
-  late final FocusNode _cityFocus;
   late final FocusNode _phoneFocus;
   late final FocusNode _nameFocus;
   late final FocusNode _cpfFocus;
   late final FocusNode _surnameFocus;
-  late final FocusNode _cepFocus;
-  late final FocusNode _addressFocus;
-  late final FocusNode _ufFocus;
+
   late final FocusNode _serviceFocus;
 
   final cpfFormatter = MaskTextInputFormatter(
     mask: '###.###.###-##',
-    filter: {'#': RegExp('[0-9]')},
-  );
-
-  final cepFormatter = MaskTextInputFormatter(
-    mask: '#####-###',
     filter: {'#': RegExp('[0-9]')},
   );
 
@@ -81,29 +72,25 @@ class _RegistrationPageState extends State<RegistrationPage> {
     _initializeControllers();
     _initializeFocusNodes();
     _formKey = GlobalKey<FormState>();
+    _addressBloc = GetAddressBloc(useCase: context.read());
   }
 
   void _initializeControllers() {
-    _cityController = TextEditingController();
-    _ufController = TextEditingController();
     _surnameController = TextEditingController();
     _nameController = TextEditingController();
     _cpfController = TextEditingController();
-    _cepController = TextEditingController();
-    _addressController = TextEditingController();
+
     _phoneController = TextEditingController();
     _serviceController = TextEditingController();
   }
 
   void _initializeFocusNodes() {
-    _cityFocus = FocusNode();
     _phoneFocus = FocusNode();
     _nameFocus = FocusNode();
     _cpfFocus = FocusNode();
-    _ufFocus = FocusNode();
+
     _surnameFocus = FocusNode();
-    _cepFocus = FocusNode();
-    _addressFocus = FocusNode();
+
     _serviceFocus = FocusNode();
   }
 
@@ -114,20 +101,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
     _surnameController.dispose();
     _cpfController.dispose();
     _phoneController.dispose();
-    _addressController.dispose();
-    _cityController.dispose();
-    _ufController.dispose();
-    _cepController.dispose();
+
     _serviceController.dispose();
     _nameFocus.dispose();
     _phoneFocus.dispose();
     _cpfFocus.dispose();
-    _cepFocus.dispose();
-    _addressFocus.dispose();
-    _cityFocus.dispose();
-    _ufFocus.dispose();
+
     _surnameFocus.dispose();
     _serviceFocus.dispose();
+
+    _addressBloc.close();
     super.dispose();
   }
 
@@ -141,27 +124,27 @@ class _RegistrationPageState extends State<RegistrationPage> {
             ? 'Cadastro de Cliente'
             : 'Cadastro de Prestador'),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              spacing: 16,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildNameField(),
-                _buildSurnameField(),
-                _buildCpfField(),
-                _buildPhoneField(),
-                if (widget.userType == 'service_provider') _buildServiceField(),
-                _buildCepField(),
-                _buildAddressField(),
-                _buildCityField(),
-                _buildUfField(),
-                const SizedBox(height: 24),
-                _buildContinueButton(),
-              ],
+      body: BlocProvider(
+        create: (context) => _addressBloc,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                spacing: 16,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildNameField(),
+                  _buildSurnameField(),
+                  _buildCpfField(),
+                  _buildPhoneField(),
+                  if (widget.userType == 'service_provider')
+                    _buildServiceField(),
+                  const SizedBox(height: 24),
+                  _buildContinueButton(),
+                ],
+              ),
             ),
           ),
         ),
@@ -403,101 +386,22 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  Widget _buildCepField() {
-    return TextFormField(
-      focusNode: _cepFocus,
-      controller: _cepController,
-      inputFormatters: [cepFormatter],
-      decoration: const InputDecoration(
-        labelText: 'CEP',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(12),
-          ),
-        ),
-      ),
-      keyboardType: TextInputType.number,
-      validator: (value) => value?.isEmpty ?? true ? 'CEP é obrigatório' : null,
-    );
-  }
-
-  Widget _buildAddressField() {
-    return TextFormField(
-      controller: _addressController,
-      focusNode: _addressFocus,
-      decoration: const InputDecoration(
-        labelText: 'Endereço',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(12),
-          ),
-        ),
-      ),
-      validator: (value) =>
-          value?.isEmpty ?? true ? 'Por favor, insira seu endereço' : null,
-    );
-  }
-
-  Widget _buildCityField() {
-    return TextFormField(
-      controller: _cityController,
-      focusNode: _cityFocus,
-      decoration: const InputDecoration(
-        labelText: 'Cidade',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(12),
-          ),
-        ),
-      ),
-      validator: (value) =>
-          value?.isEmpty ?? true ? 'Por favor, insira sua cidade' : null,
-    );
-  }
-
-  Widget _buildUfField() {
-    return TextFormField(
-      controller: _ufController,
-      focusNode: _ufFocus,
-      decoration: const InputDecoration(
-        labelText: 'Estado (UF)',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(12),
-          ),
-        ),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty)
-          return 'Por favor, insira seu estado';
-        if (value.length != 2) return 'UF deve ter 2 caracteres';
-        return null;
-      },
-    );
-  }
-
   Widget _buildContinueButton() {
     return InkWell(
       onTap: () {
         if (_formKey.currentState!.validate()) {
-          final args = ValidateEmailArguments(
-            name: _nameController.text,
-            surname: _surnameController.text,
-            cpf: _cpfController.text,
-            cep: _cepController.text,
-            city: _cityController.text,
-            phone: _phoneController.text,
-            uf: _ufController.text,
-            address: _addressController.text,
-            service: widget.userType == 'service_provider'
-                ? _selectedServices.join(', ')
-                : _serviceController.text,
-            userType: widget.userType,
-          );
-
-          context.go(
-            ValidateEmailPage.routeName,
-            extra: args.toJson(),
+          context.push(
+            AddressRegistrationPage.routeName,
+            extra: {
+              'name': _nameController.text,
+              'surname': _surnameController.text,
+              'cpf': _cpfController.text,
+              'phone': _phoneController.text,
+              'userType': widget.userType,
+              'services': widget.userType == 'service_provider'
+                  ? _selectedServices
+                  : [],
+            },
           );
         }
       },

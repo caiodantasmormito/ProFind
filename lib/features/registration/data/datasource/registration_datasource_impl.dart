@@ -43,6 +43,7 @@ final class RegistrationDataSourceImpl implements RegistrationDataSource {
         'phone': userModel.phone,
         'cpf': userModel.cpf,
         'email': userModel.email,
+        'address': userModel.address,
         'city': userModel.city,
         'uf': userModel.uf,
         'cep': userModel.cep,
@@ -80,6 +81,11 @@ final class RegistrationDataSourceImpl implements RegistrationDataSource {
         emailVerified: userModel.emailVerified,
       );
     } on FirebaseAuthException catch (e) {
+      if (e.message ==
+          'The email address is already in use by another account.') {
+        throw RegisterException(
+            message: "Este e-mail já está sendo usado por outra conta.");
+      }
       throw RegisterException(message: e.message ?? "Falha no cadastro.");
     } on FirebaseException catch (e) {
       throw RegisterException(

@@ -71,7 +71,7 @@ class _ValidateEmailPageState extends State<ValidateEmailPage> {
       body: BlocListener<RegistrationBloc, RegistrationState>(
         listener: (context, state) {
           if (state is RegistrationSuccess) {
-            context.pushReplacement(
+            context.go(
               EmailVerificationPage.routeName,
               extra: {
                 'userId': state.user.id,

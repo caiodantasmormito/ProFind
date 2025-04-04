@@ -1,11 +1,13 @@
 import 'package:profind/features/address/domain/entities/address_entity.dart';
 
 class AddressModel extends AddressEntity {
-  const AddressModel(
-      {required super.cep,
-      required super.logradouro,
-      required super.uf,
-      required super.bairro});
+  const AddressModel({
+    required super.cep,
+    required super.logradouro,
+    required super.uf,
+    required super.bairro,
+    required super.cidade,
+  });
 
   factory AddressModel.fromMap(Map<String, dynamic> map) {
     return AddressModel(
@@ -13,6 +15,7 @@ class AddressModel extends AddressEntity {
       logradouro: map['logradouro'] ?? '',
       uf: map['uf'] ?? '',
       bairro: map['bairro'] ?? '',
+      cidade: map['localidade'] ?? '',
     );
   }
 }
