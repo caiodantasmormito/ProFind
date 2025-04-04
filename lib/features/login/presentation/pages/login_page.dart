@@ -7,7 +7,6 @@ import 'package:profind/features/login/domain/usecase/authenticate_usecase.dart'
 import 'package:profind/features/login/presentation/bloc/authenticate_bloc.dart';
 import 'package:profind/features/registration/presentation/pages/personal_info_registration_page.dart';
 
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
   static const routeName = '/login';
@@ -118,8 +117,29 @@ class _LoginPageState extends State<LoginPage> {
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Colors.grey,
+                            width: 1.0,
+                          ),
                         ),
-                        label: Text("E-mail"),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Colors.grey,
+                            width: 1.0,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Colors.grey,
+                            width: 2.0,
+                          ),
+                        ),
+                        label: Text(
+                          "E-mail",
+                          style: TextStyle(color: Colors.grey[700]),
+                        ),
                         hintText: 'Digite seu e-mail',
                         errorStyle: TextStyle(color: Colors.red),
                       ),
@@ -147,6 +167,24 @@ class _LoginPageState extends State<LoginPage> {
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Colors.grey,
+                            width: 1.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Colors.grey,
+                            width: 1.0,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Colors.grey,
+                            width: 2.0,
+                          ),
                         ),
                         suffixIcon: IconButton(
                           onPressed: () {
@@ -155,10 +193,19 @@ class _LoginPageState extends State<LoginPage> {
                             });
                           },
                           icon: _isObscurePassword
-                              ? const Icon(Icons.visibility_outlined)
-                              : const Icon(Icons.visibility_off_outlined),
+                              ? Icon(
+                                  Icons.visibility_outlined,
+                                  color: Colors.grey[700],
+                                )
+                              : Icon(Icons.visibility_off_outlined,
+                                  color: Colors.grey[700]),
                         ),
-                        label: Text("Senha"),
+                        label: Text(
+                          "Senha",
+                          style: TextStyle(
+                            color: Colors.grey[700],
+                          ),
+                        ),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
@@ -262,7 +309,6 @@ class _LoginPageState extends State<LoginPage> {
       await user.reload();
 
       if (user.emailVerified) {
-        
         context.pushReplacement(HomePage.routeName);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

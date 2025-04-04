@@ -2,10 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:profind/features/login/presentation/pages/login_page.dart';
 import 'package:profind/features/chat/presentation/pages/chat_page.dart';
+import 'package:profind/features/login/presentation/pages/login_page.dart';
 import 'package:profind/features/service_providers/presentation/bloc/get_service_providers_bloc.dart';
-
 
 class ClientHomePage extends StatefulWidget {
   const ClientHomePage({super.key});
@@ -20,6 +19,8 @@ class _ClientHomePageState extends State<ClientHomePage> {
   late final FocusNode _searchFocus;
   String _searchText = '';
   bool _isAscending = true;
+  final Set<String> _selectedProfessions = {};
+  Set<String> _availableProfessions = {};
 
   @override
   void initState() {
@@ -34,6 +35,30 @@ class _ClientHomePageState extends State<ClientHomePage> {
     _searchController.dispose();
     _searchFocus.dispose();
     super.dispose();
+  }
+
+  void _updateAvailableProfessions(List<dynamic> serviceProviders) {
+    _availableProfessions = serviceProviders
+        .expand((provider) => provider.service as List<String>)
+        .toSet();
+  }
+
+  void _toggleProfession(String profession) {
+    setState(() {
+      if (_selectedProfessions.contains(profession)) {
+        _selectedProfessions.remove(profession);
+      } else {
+        _selectedProfessions.add(profession);
+      }
+    });
+    _searchController.clear();
+  }
+
+  List<String> _getSuggestions(String query) {
+    return _availableProfessions
+        .where((profession) =>
+            profession.toLowerCase().contains(query.toLowerCase()))
+        .toList();
   }
 
   @override
@@ -61,7 +86,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: BlocConsumer<GetServiceProvidersBloc, GetServiceProvidersState>(
           listener: (context, state) {
             if (state is GetServiceProvidersError && state.message != null) {
@@ -71,6 +96,9 @@ class _ClientHomePageState extends State<ClientHomePage> {
                   backgroundColor: Colors.red,
                 ),
               );
+            }
+            if (state is GetServiceProvidersSuccess) {
+              _updateAvailableProfessions(state.data);
             }
           },
           builder: (context, state) {
@@ -88,7 +116,11 @@ class _ClientHomePageState extends State<ClientHomePage> {
                 final serviceMatch = serviceProvider.service.any((service) =>
                     service.toLowerCase().contains(_searchText.toLowerCase()));
 
-                return nameMatch || serviceMatch;
+                final professionMatch = _selectedProfessions.isEmpty ||
+                    serviceProvider.service.any(
+                        (service) => _selectedProfessions.contains(service));
+
+                return (nameMatch || serviceMatch) && professionMatch;
               }).toList();
 
               filteredContacts.sort((a, b) => _isAscending
@@ -100,22 +132,95 @@ class _ClientHomePageState extends State<ClientHomePage> {
                   Row(
                     children: [
                       Expanded(
-                        child: TextFormField(
-                          controller: _searchController,
-                          focusNode: _searchFocus,
-                          decoration: InputDecoration(
-                            hintText: 'Pesquisar por nome ou profissão',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            prefixIcon: const Icon(Icons.search),
-                            contentPadding:
-                                const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              _searchText = value;
-                            });
+                        child: Autocomplete<String>(
+                          optionsBuilder: (TextEditingValue textEditingValue) {
+                            if (textEditingValue.text.isEmpty) {
+                              return const Iterable<String>.empty();
+                            }
+                            return _getSuggestions(textEditingValue.text);
+                          },
+                          onSelected: (String selection) {
+                            _toggleProfession(selection);
+                          },
+                          fieldViewBuilder: (context, controller, focusNode,
+                              onFieldSubmitted) {
+                            return TextFormField(
+                              controller: controller,
+                              focusNode: focusNode,
+                              decoration: InputDecoration(
+                                hintText: 'Digite ou selecione uma profissão',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                    color: Colors.grey,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                    color: Colors.grey,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                prefixIcon: const Icon(Icons.search),
+                                suffixIcon: IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    controller.clear();
+                                    setState(() {
+                                      _searchText = '';
+                                    });
+                                  },
+                                ),
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  _searchText = value;
+                                });
+                              },
+                            );
+                          },
+                          optionsViewBuilder: (context, onSelected, options) {
+                            return Align(
+                              alignment: Alignment.topLeft,
+                              child: Material(
+                                color: Colors.white,
+                                elevation: 4,
+                                child: Container(
+                                  constraints:
+                                      const BoxConstraints(maxHeight: 200),
+                                  width: MediaQuery.of(context).size.width - 32,
+                                  child: ListView.builder(
+                                    padding: EdgeInsets.zero,
+                                    shrinkWrap: true,
+                                    itemCount: options.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      final option = options.elementAt(index);
+                                      return ListTile(
+                                        leading: Icon(
+                                          _selectedProfessions.contains(option)
+                                              ? Icons.check_box
+                                              : Icons.check_box_outline_blank,
+                                          color: const Color(0xFFfa7f3b),
+                                        ),
+                                        title: Text(option),
+                                        onTap: () {
+                                          onSelected(option);
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            );
                           },
                         ),
                       ),
@@ -132,20 +237,42 @@ class _ClientHomePageState extends State<ClientHomePage> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
+                  if (_selectedProfessions.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: _selectedProfessions.map((profession) {
+                        return Chip(
+                          label: Text(
+                            profession,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: const Color(0xFFfa7f3b),
+                          deleteIcon: const Icon(
+                            Icons.close,
+                            size: 18,
+                            color: Colors.white,
+                          ),
+                          onDeleted: () => _toggleProfession(profession),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                  const SizedBox(height: 16),
                   Expanded(
                     child: filteredContacts.isEmpty
                         ? Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
+                              children: const [
+                                Icon(
                                   Icons.contact_mail_outlined,
                                   size: 100,
                                   color: Colors.grey,
                                 ),
-                                const SizedBox(height: 16),
-                                const Text(
+                                SizedBox(height: 16),
+                                Text(
                                   'Nenhum prestador de serviço encontrado',
                                   style: TextStyle(
                                     fontSize: 18,
@@ -178,7 +305,6 @@ class _ClientHomePageState extends State<ClientHomePage> {
                                     icon: const Icon(Icons.chat,
                                         color: Color(0xFFfa7f3b)),
                                     onPressed: () {
-                                      
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -222,7 +348,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
                 ],
               );
             }
-            return SizedBox.shrink();
+            return const SizedBox.shrink();
           },
         ),
       ),
