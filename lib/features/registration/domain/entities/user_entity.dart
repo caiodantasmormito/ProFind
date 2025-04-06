@@ -66,13 +66,12 @@ class UserEntity extends Equatable {
         userType: userType,
       );
 
-  // Novo método factory para criar uma instância a partir do Firestore
   factory UserEntity.fromFirestore(
     DocumentSnapshot doc, {
     required String userType,
   }) {
     final data = doc.data() as Map<String, dynamic>;
-    
+
     return UserEntity(
       id: doc.id,
       emailVerified: data['emailVerified'] ?? false,
@@ -90,7 +89,6 @@ class UserEntity extends Equatable {
     );
   }
 
-  // Método de cópia com modificações
   UserEntity copyWith({
     String? id,
     String? name,
